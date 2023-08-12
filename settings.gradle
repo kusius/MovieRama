@@ -14,4 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MovieRama"
 include ':app'
+include ':core:model'
 include ':core:network'
