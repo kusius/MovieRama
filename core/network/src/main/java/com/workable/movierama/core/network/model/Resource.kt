@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Defines the general structured of paged results given by the TMDB API endpoints
+ * Defines the general structure of paged results given by the TMDB API endpoints
  */
 @Serializable
 data class ApiResourceList<T>(

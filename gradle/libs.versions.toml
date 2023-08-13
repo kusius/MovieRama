@@ -1,14 +1,21 @@
 [versions]
+androidxCoreKtx = "1.10.1"
+androidxPaging = "3.1.1"
+androidxPagingCompose = "3.2.0"
+junit4 = "4.13.2"
 koin = "3.4.3"
 koinAndroid = "3.4.3"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.1"
 kotlin = "1.8.20"
 ktor = "2.3.3"
-junit4 = "4.13.2"
 kotlinxCoroutines = "1.6.4"
 
 [libraries]
+androidx-core-ktx = { group = "androidx.core", name ="core-ktx", version.ref = "androidxCoreKtx"}
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidxPaging"}
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidxPagingCompose"}
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin"}
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroid" }
@@ -21,11 +28,8 @@ ktor-client-resources = { group = "io.ktor", name = "ktor-client-resources", ver
 ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor"}
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor"}
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor"}
-junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
-
-
 
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
