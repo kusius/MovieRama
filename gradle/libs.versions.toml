@@ -1,8 +1,32 @@
 [versions]
 koin = "3.4.3"
 koinAndroid = "3.4.3"
+kotlinxDatetime = "0.4.0"
+kotlinxSerializationJson = "1.5.1"
+kotlin = "1.8.20"
+ktor = "2.3.3"
+junit4 = "4.13.2"
+kotlinxCoroutines = "1.6.4"
 
 [libraries]
-koin-core = { group = "io.insert-koin", name = "koin-core", version = "koin"}
-koin-test = { group = "io.insert-koin", name = "koin-test", version = "koin"}
-koin-android = { group = "io.insert-koin", name = "koin-android", version = "koinAndroid"}
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin"}
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroid" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor"}
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor"}
+ktor-client-contentNegotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor"}
+ktor-client-resources = { group = "io.ktor", name = "ktor-client-resources", version.ref = "ktor"}
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor"}
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor"}
+ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor"}
+junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+
+
+
+[plugins]
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

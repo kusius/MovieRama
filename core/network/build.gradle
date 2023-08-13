@@ -1,9 +1,27 @@
 plugins {
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
+    id 'kotlin'
+    id 'kotlinx-serialization'
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_7
-    targetCompatibility = JavaVersion.VERSION_1_7
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation(project(":core:model"))
+    implementation libs.kotlinx.serialization.json
+    implementation libs.ktor.client.core
+    implementation libs.ktor.client.cio
+    implementation libs.ktor.client.contentNegotiation
+    implementation libs.ktor.client.resources
+    implementation libs.ktor.client.auth
+    implementation libs.ktor.client.logging
+    implementation libs.ktor.serialization.json
+    implementation libs.koin.core
+
+    testImplementation(libs.junit4)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
