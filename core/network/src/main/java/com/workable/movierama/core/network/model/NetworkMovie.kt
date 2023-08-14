@@ -4,12 +4,13 @@ import com.workable.movierama.core.model.Movie
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 @Serializable
 data class NetworkMovie(
     val id: Int,
-    @SerialName("poster_path")
+    @SerialName("backdrop_path")
     val posterUrl: String,
-    @SerialName("original_title")
+    @SerialName("title")
     val originalTitle: String,
     @SerialName("vote_average")
     val rating: Float,
@@ -19,9 +20,10 @@ data class NetworkMovie(
 
 fun NetworkMovie.asExternalModel(): Movie =
     Movie(
-        posterUrl = this.posterUrl,
+        id = this.id,
+        posterUrl = "${IMAGE_BASE_URL}${this.posterUrl}",
         title = this.originalTitle,
         releaseDate = this.releaseDate,
-        rating = this.rating,
+        ratingOutOf10 = this.rating,
         isFavourite = false
 )

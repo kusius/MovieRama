@@ -5,4 +5,5 @@ import com.workable.movierama.core.model.Movie
 
 interface MoviesRepository {
     fun getPopularMoviesPagingSource() : PagingSource<Int, Movie>
+    suspend fun markFavourite(movieId: Int, isFavourite: Boolean)
 }
