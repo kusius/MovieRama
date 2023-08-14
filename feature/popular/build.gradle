@@ -1,23 +1,18 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'com.workable.movierama'
+    namespace 'com.workable.movierama.feature.popular'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.workable.movierama"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -39,37 +34,32 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
     }
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
-    }
 }
 
 dependencies {
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:data"))
-    implementation(project(":feature:popular"))
+
     implementation libs.androidx.core.ktx
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.2'
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
     implementation(platform(libs.androidx.compose.bom))
     implementation libs.androidx.compose.ui
     implementation libs.androidx.compose.ui.graphics
     implementation libs.androidx.compose.ui.tooling.preview
     implementation libs.androidx.compose.material3
-    testImplementation libs.junit4
+    implementation libs.coil.compose
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.paging.runtime
+    implementation libs.androidx.paging.compose
     implementation libs.koin.core
     implementation libs.koin.android
     implementation libs.koin.compose
     implementation libs.koin.androidx.compose
     implementation libs.androidx.navigation.compose
+    testImplementation libs.junit4
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation libs.androidx.compose.ui.tooling
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
-
-    implementation libs.kotlinx.datetime
 }

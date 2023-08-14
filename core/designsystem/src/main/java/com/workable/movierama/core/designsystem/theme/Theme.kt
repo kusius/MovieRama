@@ -1,4 +1,4 @@
-package com.workable.movierama.ui.theme
+package com.workable.movierama.core.designsystem.theme
 
 import android.app.Activity
 import android.os.Build

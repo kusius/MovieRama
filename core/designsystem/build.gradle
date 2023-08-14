@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.core.data'
+    namespace 'com.workable.movierama.core.designsystem'
     compileSdk 33
 
     defaultConfig {
@@ -28,18 +28,21 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.jvmTarget.get()
     }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
+    }
 }
 
 dependencies {
-    implementation libs.androidx.paging.runtime
-    implementation libs.androidx.paging.compose
-    implementation libs.koin.core
-    implementation(project(":core:model"))
-    implementation(project(":core:network"))
-    implementation libs.androidx.core.ktx
-    testImplementation libs.junit4
-    testImplementation libs.kotlinx.coroutines.test
-    testImplementation libs.koin.test
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation(platform(libs.androidx.compose.bom))
+    implementation libs.androidx.compose.ui
+    implementation libs.androidx.compose.ui.graphics
+    implementation libs.androidx.compose.ui.tooling.preview
+    implementation libs.androidx.compose.material3
+    debugImplementation libs.androidx.compose.ui.tooling
+
 }
