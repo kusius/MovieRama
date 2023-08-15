@@ -2,6 +2,10 @@ package com.workable.movierama.feature.popular
 
 import android.util.Log
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,12 +16,17 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.paging.LoadState
@@ -44,11 +53,11 @@ import coil.compose.AsyncImage
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.workable.movierama.core.designsystem.theme.MovieRamaTheme
+import com.workable.movierama.core.designsystem.theme.component.MovieRamaSearchBar
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.PullRefreshIndicator
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.pullRefresh
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.rememberPullRefreshState
 import com.workable.movierama.core.model.Movie
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import com.workable.movierama.core.designsystem.R as designR
@@ -59,17 +68,55 @@ internal fun PopularMoviesRoute(
     viewModel: PopularMoviesViewmodel = koinViewModel()
 ) {
     val lazyPagingItems = viewModel.uiState.collectAsLazyPagingItems()
+//    WhatTheFuck()
     MoviesScreen(
         onMovieClick = onMovieClick,
         onFavouriteChanged = viewModel::markFavourite,
+        onSearchQueryChanged = viewModel::searchMovies,
         lazyPagingItems = lazyPagingItems
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun WhatTheFuck(modifier: Modifier = Modifier) {
+    val (first, second, third, fourth) = remember { FocusRequester.createRefs() }
+    var active by remember { mutableStateOf(false) }
+    Column() {
+        SearchBar(
+            query = "",
+            onQueryChange = {},
+            onSearch = {},
+            active = active,
+            shape = SearchBarDefaults.dockedShape,
+            onActiveChange = {
+                Log.i("PopularMoviesScreen", "Search bar active status changed to $it")
+            },
+            placeholder = { Text(text = stringResource(R.string.search_hint)) },
+            leadingIcon = {
+                Icon(
+                    Icons.Outlined.Search,
+                    contentDescription = stringResource(id = R.string.search_hint)
+                )
+            },
+
+        ) {
+            Text(text = " Hellop")
+        }
+        Button(onClick = { active = !active}) {
+            Text(text = " Button", modifier = modifier.focusable(true))
+
+        }
+        Text(text = " World", modifier = modifier.focusable(true))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MoviesScreen(
     onMovieClick: (Int) -> Unit,
-    onFavouriteChanged: (Int,Boolean) -> Unit,
+    onFavouriteChanged: (Int, Boolean) -> Unit,
+    onSearchQueryChanged: (String) -> Unit,
     lazyPagingItems: LazyPagingItems<Movie>,
     modifier: Modifier = Modifier
 ) {
@@ -78,53 +125,68 @@ fun MoviesScreen(
 
     fun refresh() = refreshScope.launch {
         lazyPagingItems.refresh()
-//        refreshing = true
-//        onRefresh()
-//        refreshing = false
     }
 
     val state = rememberPullRefreshState(refreshing, ::refresh)
 
-    Box(
-        modifier = modifier.pullRefresh(state = state)
-    ) {
-        LazyColumn {
-            if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
-                refreshing = true
-            }
+    var searchQuery by remember { mutableStateOf("") }
+    fun search(query: String) {
+        searchQuery = query
+        onSearchQueryChanged(searchQuery)
+    }
 
-            items(count = lazyPagingItems.itemCount) { index ->
-                refreshing = false
-                val item = lazyPagingItems[index]
-                if (item != null)
-                    MovieItem(
-                        movie = item,
-                        onFavouriteChanged = { isFavourite ->
-                            onFavouriteChanged(item.id, isFavourite)
-                        },
-                        modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))
-                    )
-            }
+    Column(modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))) {
+        MovieRamaSearchBar(
+            onQueryChanged = ::search,
+            onSearch = ::search,
+            placeholder = { Text(text = stringResource(R.string.search_hint)) },
+        )
+        Box(
+            modifier = modifier
+                .pullRefresh(state = state)
+                .padding(top = dimensionResource(id = designR.dimen.padding_small))
+        ) {
+            LazyColumn(modifier = modifier.focusGroup()) {
+                if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
+                    refreshing = true
+                }
 
-            if (lazyPagingItems.loadState.append == LoadState.Loading) {
-                item {
-                    CircularProgressIndicator(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.CenterHorizontally)
-                    )
+                items(count = lazyPagingItems.itemCount) { index ->
+                    refreshing = false
+                    val item = lazyPagingItems[index]
+                    if (item != null)
+                        MovieItem(
+                            movie = item,
+                            onFavouriteChanged = { isFavourite ->
+                                onFavouriteChanged(item.id, isFavourite)
+                            },
+                            modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))
+                        )
+                }
+
+                if (lazyPagingItems.loadState.append == LoadState.Loading) {
+                    item {
+                        CircularProgressIndicator(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+                        )
+                    }
                 }
             }
+
+            PullRefreshIndicator(
+                modifier = modifier
+                    .testTag("PullRefreshIndicator")
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+                refreshing = true,
+                state = state,
+            )
         }
-        PullRefreshIndicator(
-            modifier = modifier
-                .testTag("PullRefreshIndicator")
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.CenterHorizontally),
-            refreshing = true,
-            state = state,
-        )
+
     }
+
 }
 
 @Composable

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="waiting_for_movies">Waiting for movies to load</string>
+    <string name="search_hint">Search for movie by title</string>
 </resources>
