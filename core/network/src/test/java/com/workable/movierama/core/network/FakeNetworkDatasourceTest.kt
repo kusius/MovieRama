@@ -9,6 +9,7 @@ import org.junit.Test
 import org.koin.core.context.startKoin
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import kotlin.test.assertContentEquals
 
 class FakeNetworkDatasourceTest : KoinTest {
     private val subject: FakeMovieNetworkDataSource by inject()

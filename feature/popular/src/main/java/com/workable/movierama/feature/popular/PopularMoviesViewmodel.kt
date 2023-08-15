@@ -8,7 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.workable.core.data.repository.MoviesRepository
-import com.workable.core.domain.usecase.FormatDateUseCase
+import com.workable.movierama.core.domain.usecase.FormatDateUseCase
 import com.workable.movierama.core.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -20,7 +20,6 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
     // contains the marked favourite movies. This will be replaced when persistence is added
     // since source of truth will be it and propagate through the repository
     private val viewEventsFlow = MutableStateFlow<List<ViewEvent>>(emptyList())
-//    private val pagingSource =
     private val _uiState = Pager(PagingConfig(pageSize = 10)) {
         moviesRepository.getPopularMoviesPagingSource()
     }.flow.cachedIn(viewModelScope)
@@ -55,12 +54,6 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
 //            moviesRepository.markFavourite(movieId = movieId, isFavourite = isFavourite)
             viewEventsFlow.value +=
                 ViewEvent.EditFavourite(movieId = movieId, isFavourite = isFavourite)
-        }
-    }
-
-    fun refresh() {
-        viewModelScope.launch {
-
         }
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.core.data'
+    namespace 'com.workable.movierama.core.data'
     compileSdk 33
 
     defaultConfig {

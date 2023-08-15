@@ -1,4 +1,4 @@
-package com.workable.core.domain.usecase
+package com.workable.movierama.core.domain.usecase
 
 import android.util.Log
 import java.time.LocalDateTime
@@ -20,7 +20,8 @@ class FormatDateUseCase() {
             "${localDateTime.dayOfMonth} ${localDateTime.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())} ${localDateTime.year}"
         } catch (e: DateTimeParseException) {
             println("FormatDateUseCase Error: ${e.message}")
-            return "00 00 00"
+            // leave it unaltered
+            return apiDateString
         }
     }
 }

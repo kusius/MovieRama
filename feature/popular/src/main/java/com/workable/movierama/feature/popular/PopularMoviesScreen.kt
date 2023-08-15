@@ -35,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -61,7 +62,6 @@ internal fun PopularMoviesRoute(
     MoviesScreen(
         onMovieClick = onMovieClick,
         onFavouriteChanged = viewModel::markFavourite,
-        onRefresh = viewModel::refresh,
         lazyPagingItems = lazyPagingItems
     )
 }
@@ -70,7 +70,6 @@ internal fun PopularMoviesRoute(
 fun MoviesScreen(
     onMovieClick: (Int) -> Unit,
     onFavouriteChanged: (Int,Boolean) -> Unit,
-    onRefresh: () -> Unit,
     lazyPagingItems: LazyPagingItems<Movie>,
     modifier: Modifier = Modifier
 ) {
@@ -92,14 +91,6 @@ fun MoviesScreen(
         LazyColumn {
             if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
                 refreshing = true
-//                item {
-//                    Text(
-//                        text = stringResource(R.string.waiting_for_movies),
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .wrapContentWidth(Alignment.CenterHorizontally)
-//                    )
-//                }
             }
 
             items(count = lazyPagingItems.itemCount) { index ->
@@ -127,6 +118,7 @@ fun MoviesScreen(
         }
         PullRefreshIndicator(
             modifier = modifier
+                .testTag("PullRefreshIndicator")
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally),
             refreshing = true,

@@ -1,6 +1,5 @@
-package com.workable.core.domain
+package com.workable.movierama.core.domain.usecase
 
-import com.workable.core.domain.usecase.FormatDateUseCase
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -12,9 +11,17 @@ import org.junit.Assert.*
  */
 class DateTimeTest {
     @Test
-    fun dateTimeCorrectlyFormatted() {
+    fun datetime_correctly_formatted() {
         val expected = "6 May 2021"
         val apiString = "2021-05-06"
+        val actual = FormatDateUseCase().invoke(apiString)
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun returns_input_when_cannot_parse() {
+        val expected = "invalid input"
+        val apiString = "invalid input"
         val actual = FormatDateUseCase().invoke(apiString)
         assertEquals(expected, actual)
     }
