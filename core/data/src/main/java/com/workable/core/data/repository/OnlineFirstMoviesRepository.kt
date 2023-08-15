@@ -9,7 +9,7 @@ class OnlineFirstMoviesRepository(private val networkDataSource: MovieNetworkDat
     private val moviesPagingSource = MoviesPagingSource(networkDataSource)
     private val favouriteMovies = mutableSetOf<Int>()
     override fun getPopularMoviesPagingSource(): PagingSource<Int, Movie> {
-        return moviesPagingSource
+        return MoviesPagingSource(networkDataSource)
     }
 
     override suspend fun markFavourite(movieId: Int, isFavourite: Boolean) {

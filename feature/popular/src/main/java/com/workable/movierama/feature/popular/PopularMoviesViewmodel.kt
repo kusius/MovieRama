@@ -20,9 +20,9 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
     // contains the marked favourite movies. This will be replaced when persistence is added
     // since source of truth will be it and propagate through the repository
     private val viewEventsFlow = MutableStateFlow<List<ViewEvent>>(emptyList())
-    private val pagingSource = moviesRepository.getPopularMoviesPagingSource()
+//    private val pagingSource =
     private val _uiState = Pager(PagingConfig(pageSize = 10)) {
-        pagingSource
+        moviesRepository.getPopularMoviesPagingSource()
     }.flow.cachedIn(viewModelScope)
 
     val uiState = _uiState
@@ -57,6 +57,12 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
                 ViewEvent.EditFavourite(movieId = movieId, isFavourite = isFavourite)
         }
     }
+
+    fun refresh() {
+        viewModelScope.launch {
+
+        }
+    }
 }
 
 sealed interface MovieUiState {
@@ -77,6 +83,6 @@ val testMovie = Movie(
     title = "Movie Title",
     posterUrl = "https://placehold.co/600x400",
     isFavourite = true,
-    releaseDate = "11/11/11",
+    releaseDate = "6 Jun 1934",
     ratingOutOf10 = 4.4f
 )

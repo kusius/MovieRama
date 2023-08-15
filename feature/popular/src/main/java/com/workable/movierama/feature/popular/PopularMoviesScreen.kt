@@ -1,6 +1,8 @@
 package com.workable.movierama.feature.popular
 
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -29,12 +32,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
 import com.workable.movierama.core.designsystem.theme.MovieRamaTheme
+import com.workable.movierama.core.designsystem.theme.component.pullrefresh.PullRefreshIndicator
+import com.workable.movierama.core.designsystem.theme.component.pullrefresh.pullRefresh
+import com.workable.movierama.core.designsystem.theme.component.pullrefresh.rememberPullRefreshState
 import com.workable.movierama.core.model.Movie
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import com.workable.movierama.core.designsystem.R as designR
 
@@ -47,6 +61,7 @@ internal fun PopularMoviesRoute(
     MoviesScreen(
         onMovieClick = onMovieClick,
         onFavouriteChanged = viewModel::markFavourite,
+        onRefresh = viewModel::refresh,
         lazyPagingItems = lazyPagingItems
     )
 }
@@ -55,41 +70,68 @@ internal fun PopularMoviesRoute(
 fun MoviesScreen(
     onMovieClick: (Int) -> Unit,
     onFavouriteChanged: (Int,Boolean) -> Unit,
-    lazyPagingItems: LazyPagingItems<Movie>
+    onRefresh: () -> Unit,
+    lazyPagingItems: LazyPagingItems<Movie>,
+    modifier: Modifier = Modifier
 ) {
-    LazyColumn {
-        if(lazyPagingItems.loadState.refresh == LoadState.Loading) {
-            item {
-                Text(
-                    text = stringResource(R.string.waiting_for_movies),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                )
+    val refreshScope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(lazyPagingItems.loadState.refresh == LoadState.Loading) }
+
+    fun refresh() = refreshScope.launch {
+        lazyPagingItems.refresh()
+//        refreshing = true
+//        onRefresh()
+//        refreshing = false
+    }
+
+    val state = rememberPullRefreshState(refreshing, ::refresh)
+
+    Box(
+        modifier = modifier.pullRefresh(state = state)
+    ) {
+        LazyColumn {
+            if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
+                refreshing = true
+//                item {
+//                    Text(
+//                        text = stringResource(R.string.waiting_for_movies),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .wrapContentWidth(Alignment.CenterHorizontally)
+//                    )
+//                }
+            }
+
+            items(count = lazyPagingItems.itemCount) { index ->
+                refreshing = false
+                val item = lazyPagingItems[index]
+                if (item != null)
+                    MovieItem(
+                        movie = item,
+                        onFavouriteChanged = { isFavourite ->
+                            onFavouriteChanged(item.id, isFavourite)
+                        },
+                        modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))
+                    )
+            }
+
+            if (lazyPagingItems.loadState.append == LoadState.Loading) {
+                item {
+                    CircularProgressIndicator(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    )
+                }
             }
         }
-
-        items(count = lazyPagingItems.itemCount) { index ->
-            val item = lazyPagingItems[index]
-            if (item != null)
-                MovieItem(
-                    movie = item,
-                    onFavouriteChanged = { isFavourite ->
-                        onFavouriteChanged(item.id, isFavourite)
-                    },
-                    modifier = Modifier.padding(dimensionResource(designR.dimen.padding_small))
-                )
-        }
-
-        if (lazyPagingItems.loadState.append == LoadState.Loading) {
-            item {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                )
-            }
-        }
+        PullRefreshIndicator(
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentWidth(Alignment.CenterHorizontally),
+            refreshing = true,
+            state = state,
+        )
     }
 }
 
@@ -125,19 +167,38 @@ fun MovieInformation(movie: Movie, onFavouriteChange: (Boolean) -> Unit, modifie
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(dimensionResource(com.workable.movierama.core.designsystem.R.dimen.padding_small))
     ) {
         Column {
-            Text(text = movie.title)
-            Row {
-                Text(text = movie.ratingOutOf10.toString())
-                Text(text = movie.releaseDate, modifier = Modifier.padding(start = dimensionResource(
-                    id = com.workable.movierama.core.designsystem.R.dimen.padding_small
-                )))
+            Text(
+                text = movie.title,
+                style = MaterialTheme.typography.displayMedium
+            )
+            Row() {
+                RatingBar(
+                    value = movie.ratingOutOf10 / 2,
+                    style = RatingBarStyle.Stroke(),
+                    spaceBetween = dimensionResource(id = com.workable.movierama.core.designsystem.R.dimen.padding_tiny),
+                    size = dimensionResource(id = R.dimen.star_rating_size),
+                    onValueChange = {},
+                    onRatingChanged = {},
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = movie.releaseDate,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier
+                        .padding(start = dimensionResource(id = com.workable.movierama.core.designsystem.R.dimen.padding_small))
+                        .align(Alignment.CenterVertically)
+                )
             }
         }
         Spacer(modifier = modifier.weight(1f))
-        FavouriteImageButton(isFavourite = movie.isFavourite, onFavouriteChanged = onFavouriteChange)
+        FavouriteImageButton(
+            isFavourite = movie.isFavourite,
+            onFavouriteChanged = onFavouriteChange,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
     }
 }
 
@@ -151,12 +212,18 @@ fun FavouriteImageButton(isFavourite: Boolean, onFavouriteChanged: (Boolean) -> 
             onFavouriteChanged(favourite)
         },
         modifier = modifier) {
+        val tint by animateColorAsState(
+            if (isFavourite) colorResource(id = R.color.favourite) else colorResource(
+                id = R.color.not_favourite
+            )
+        )
         Icon(
             imageVector = if (isFavourite) {
                 Icons.Filled.Favorite
             } else {
                 Icons.Default.Favorite
             },
+            tint = tint,
             contentDescription = null
         )
     }
@@ -171,5 +238,12 @@ fun PopularMoviesScreenPreview() {
             onFavouriteChanged = {},
             modifier = Modifier
         )
+
+//        MoviesScreen(
+//            onMovieClick = {},
+//            onFavouriteChanged = {_, _ -> },
+//            onRefresh = {  },
+//            lazyPagingItems = viewModel.uiState.collectAsLazyPagingItems()
+//        )
     }
 }

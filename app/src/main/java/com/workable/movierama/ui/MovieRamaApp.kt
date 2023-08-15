@@ -27,15 +27,7 @@ import com.workable.movierama.navigation.TopLevelDestination
 
 @Composable
 fun MovieRamaApp(appState: MovieRamaAppState = rememberMovieRamaAppState()) {
-    Scaffold(
-        bottomBar = {
-            MovieRamaBottomBar(
-                destinations = appState.topLevelDestinations,
-                onNavigateToDestination = appState::navigateToTopLevelDestination,
-                currentDestination = appState.currentDestination,
-            )
-        }
-    ) { paddingValues ->
+    Scaffold() { paddingValues ->
         Row(
             Modifier
                 .fillMaxSize()
@@ -65,8 +57,9 @@ fun MovieRamaBottomBar(
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
                 icon = {
-                    Icon(painter = painterResource(id = R.drawable.ic_launcher_background), contentDescription = null)
-                }
+                    if (selected) destination.selectedIcon else destination.unselectedIcon
+                },
+
             )
         }
     }
@@ -75,6 +68,8 @@ fun MovieRamaBottomBar(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
+    val selected = true
+    val destination = TopLevelDestination.POPULAR
     MovieRamaTheme {
         MovieRamaApp()
     }
