@@ -1,7 +1,7 @@
 package com.workable.movierama.feature.popular
 
 import androidx.paging.testing.asSnapshot
-import com.workable.movierama.core.model.Movie
+import com.workable.movierama.core.model.MovieSummary
 import com.workable.movierama.feature.popular.util.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -17,7 +17,7 @@ class PopularMoviesViewModelTest {
     val testData = buildList {
         repeat(50) {
             add(
-                Movie(
+                MovieSummary(
                 id = it,
                 title = "Movie$it",
                 posterUrl = "url$it",

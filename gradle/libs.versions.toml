@@ -58,6 +58,7 @@ ktor-client-resources = { group = "io.ktor", name = "ktor-client-resources", ver
 ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor"}
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor"}
 ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor"}
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 

@@ -3,10 +3,10 @@ package com.workable.movierama.feature.popular.fake
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.workable.core.data.repository.MoviesRepository
-import com.workable.movierama.core.model.Movie
+import com.workable.movierama.core.model.MovieSummary
 
-class FakeMoviesRepository(private val testData: List<Movie>): MoviesRepository {
-    override fun getPopularMoviesPagingSource(): PagingSource<Int, Movie> {
+class FakeMoviesRepository(private val testData: List<MovieSummary>): MoviesRepository {
+    override fun getPopularMoviesPagingSource(): PagingSource<Int, MovieSummary> {
         return FakeMoviesPagingSource(testData)
     }
 
@@ -15,10 +15,10 @@ class FakeMoviesRepository(private val testData: List<Movie>): MoviesRepository 
     }
 }
 
-class FakeMoviesPagingSource(private val testData: List<Movie>) : PagingSource<Int, Movie>() {
-    override fun getRefreshKey(state: PagingState<Int, Movie>): Int? = null
+class FakeMoviesPagingSource(private val testData: List<MovieSummary>) : PagingSource<Int, MovieSummary>() {
+    override fun getRefreshKey(state: PagingState<Int, MovieSummary>): Int? = null
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieSummary> {
         return LoadResult.Page(
             data = testData,
             prevKey = null,

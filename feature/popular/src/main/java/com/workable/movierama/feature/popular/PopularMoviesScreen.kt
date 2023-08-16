@@ -32,8 +32,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.gowtham.ratingbar.RatingBar
-import com.gowtham.ratingbar.RatingBarStyle
 import com.workable.movierama.core.designsystem.theme.MovieRamaTheme
 import com.workable.movierama.core.designsystem.theme.component.MovieRamaFavouriteButton
 import com.workable.movierama.core.designsystem.theme.component.MovieRamaRating
@@ -41,7 +39,7 @@ import com.workable.movierama.core.designsystem.theme.component.MovieRamaSearchB
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.PullRefreshIndicator
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.pullRefresh
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.rememberPullRefreshState
-import com.workable.movierama.core.model.Movie
+import com.workable.movierama.core.model.MovieSummary
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import com.workable.movierama.core.designsystem.R as designR
@@ -65,7 +63,7 @@ fun MoviesScreen(
     onMovieClick: (Int) -> Unit,
     onFavouriteChanged: (Int, Boolean) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
-    lazyPagingItems: LazyPagingItems<Movie>,
+    lazyPagingItems: LazyPagingItems<MovieSummary>,
     modifier: Modifier = Modifier
 ) {
     val refreshScope = rememberCoroutineScope()
@@ -104,7 +102,7 @@ fun MoviesScreen(
                     val item = lazyPagingItems[index]
                     if (item != null)
                         MovieItem(
-                            movie = item,
+                            movieSummary = item,
                             onFavouriteChanged = { isFavourite ->
                                 onFavouriteChanged(item.id, isFavourite)
                             },
@@ -138,14 +136,14 @@ fun MoviesScreen(
 }
 
 @Composable
-fun MovieItem(movie: Movie, onFavouriteChanged: (Boolean) -> kotlin.Unit, modifier: Modifier = Modifier) {
+fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> kotlin.Unit, modifier: Modifier = Modifier) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = modifier
     ){
         Column(modifier = Modifier){
             AsyncImage(
-                model = movie.posterUrl,
+                model = movieSummary.posterUrl,
                 placeholder = painterResource(id = designR.drawable.placeholder),
                 error = painterResource(id = designR.drawable.placeholder),
                 contentScale = ContentScale.Crop,
@@ -155,7 +153,7 @@ fun MovieItem(movie: Movie, onFavouriteChanged: (Boolean) -> kotlin.Unit, modifi
                 .fillMaxWidth()
             ) {
                 MovieInformation(
-                    movie = movie,
+                    movieSummary = movieSummary,
                     onFavouriteChange = onFavouriteChanged,
                     modifier = modifier)
             }
@@ -164,20 +162,20 @@ fun MovieItem(movie: Movie, onFavouriteChanged: (Boolean) -> kotlin.Unit, modifi
 }
 
 @Composable
-fun MovieInformation(movie: Movie, onFavouriteChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Column {
             Text(
-                text = movie.title,
+                text = movieSummary.title,
                 style = MaterialTheme.typography.displayMedium
             )
             Row() {
-                MovieRamaRating(rating = movie.ratingOutOf10 / 2, modifier = Modifier.align(Alignment.CenterVertically))
+                MovieRamaRating(rating = movieSummary.ratingOutOf10 / 2, modifier = Modifier.align(Alignment.CenterVertically))
                 Text(
-                    text = movie.releaseDate,
+                    text = movieSummary.releaseDate,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier
                         .padding(start = dimensionResource(id = com.workable.movierama.core.designsystem.R.dimen.padding_small))
@@ -187,7 +185,7 @@ fun MovieInformation(movie: Movie, onFavouriteChange: (Boolean) -> Unit, modifie
         }
         Spacer(modifier = modifier.weight(1f))
         MovieRamaFavouriteButton(
-            isFavourite = movie.isFavourite,
+            isFavourite = movieSummary.isFavourite,
             onFavouriteChanged = onFavouriteChange,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
@@ -199,7 +197,7 @@ fun MovieInformation(movie: Movie, onFavouriteChange: (Boolean) -> Unit, modifie
 fun PopularMoviesScreenPreview() {
     MovieRamaTheme {
         MovieItem(
-            movie = testMovie,
+            movieSummary = testMovieSummary,
             onFavouriteChanged = {},
             modifier = Modifier
         )
