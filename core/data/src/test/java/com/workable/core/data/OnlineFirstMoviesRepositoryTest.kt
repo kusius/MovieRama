@@ -8,9 +8,11 @@ import com.workable.movierama.core.model.Movie
 import com.workable.movierama.core.network.di.networkModule
 import com.workable.movierama.core.network.fake.FakeMovieNetworkDataSource
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertIs
@@ -28,6 +30,11 @@ class OnlineFirstMoviesRepositoryTest : KoinTest {
         }
 
         subject = OnlineFirstMoviesRepository(get<FakeMovieNetworkDataSource>())
+    }
+
+    @After
+    fun cleanup() {
+        stopKoin()
     }
 
     @Test
