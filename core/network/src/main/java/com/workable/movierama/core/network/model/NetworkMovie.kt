@@ -9,7 +9,7 @@ const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 data class NetworkMovie(
     val id: Int,
     @SerialName("backdrop_path")
-    val posterUrl: String,
+    val backdropUrl: String?,
     @SerialName("title")
     val originalTitle: String,
     @SerialName("vote_average")
@@ -21,7 +21,7 @@ data class NetworkMovie(
 fun NetworkMovie.asExternalModel(): Movie =
     Movie(
         id = this.id,
-        posterUrl = "${IMAGE_BASE_URL}${this.posterUrl}",
+        posterUrl = "${IMAGE_BASE_URL}${this.backdropUrl}",
         title = this.originalTitle,
         releaseDate = this.releaseDate,
         ratingOutOf10 = this.rating,

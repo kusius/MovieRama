@@ -14,4 +14,11 @@ class KtorMovieNetworkDatasourceTest {
         assertNotNull(result)
         assertTrue(result.isNotEmpty())
     }
+
+    @Test
+    fun fetch_search_movie() = runTest {
+        val result = dataSource.searchMovies(query = "Leon", page = 1)
+        // we expect at least 1 ("Leon the professional")
+        assertTrue(result.isNotEmpty())
+    }
 }

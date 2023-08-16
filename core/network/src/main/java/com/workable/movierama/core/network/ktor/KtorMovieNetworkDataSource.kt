@@ -16,7 +16,8 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-private const val MOVIE_BACKEND_URL = "https://api.themoviedb.org/3/movie/"
+private const val BACKEND_URL = "https://api.themoviedb.org/3/"
+//private const val MOVIE_BACKEND_URL = "$BACKEND_URL/movie/"
 private const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzODVkYTY5YTk1ZTg0OGU4OWRmN2U0MmFjMWNkZWNiMSIsInN1YiI6IjY0ZDdhZmMzZjE0ZGFkMDBhZDRmMTNiOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.PQMBcGPq76LHOC-6Y3r0ajDC0r-LpL_5ClPiNsvVNEc"
 private const val API_KEY = "385da69a95e848e89df7e42ac1cdecb1"
 
@@ -28,7 +29,7 @@ class KtorMovieNetworkDataSource : MovieNetworkDataSource {
                     BearerTokens(ACCESS_TOKEN, API_KEY)
                 }
                 sendWithoutRequest { request ->
-                    request.url.host == MOVIE_BACKEND_URL
+                    request.url.host == BACKEND_URL
                 }
             }
         }
@@ -44,7 +45,7 @@ class KtorMovieNetworkDataSource : MovieNetworkDataSource {
 
         install(Resources)
         defaultRequest {
-            url(MOVIE_BACKEND_URL)
+            url(BACKEND_URL)
         }
     }
 
@@ -53,7 +54,16 @@ class KtorMovieNetworkDataSource : MovieNetworkDataSource {
         return result.body()
     }
 
+    private suspend fun searchMoviePage(query: String, page: Int): ApiResourceList<NetworkMovie> {
+        val result = client.get(NetworkSearchResource(query = query, page = page))
+        return result.body()
+    }
+
     override suspend fun getPopularMovies(page: Int): List<NetworkMovie> {
         return popularMoviesPage(page = page).results
+    }
+
+    override suspend fun searchMovies(query: String, page: Int): List<NetworkMovie> {
+        return searchMoviePage(query = query, page = page).results
     }
 }
