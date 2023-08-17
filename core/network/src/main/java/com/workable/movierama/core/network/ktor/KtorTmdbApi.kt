@@ -15,3 +15,15 @@ class NetworkSearchResource(
     val page: Int = 1,
     val language: String = "en-US"
 )
+
+@Resource("/movie")
+class NetworkMovieDetailResource() {
+    @Resource("{id}")
+    class Id(val parent: NetworkMovieDetailResource = NetworkMovieDetailResource(), val id: Int) {
+        @Resource("/reviews")
+        class Reviews(val parent: Id, val page: Int)
+
+        @Resource("/similar")
+        class Similar(val parent: Id, val page: Int)
+    }
+}

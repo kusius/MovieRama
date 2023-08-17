@@ -9,10 +9,10 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.workable.movierama.feature.popular.PopularMoviesRoute
 
-const val LINKED_NEWS_RESOURCE_ID = "linkedNewsResourceId"
-const val popularMoviesNavigationRoute = "for_you_route/{$LINKED_NEWS_RESOURCE_ID}"
+const val POPULAR_MOVIES_RESOURCE_ID = "linkedNewsResourceId"
+const val popularMoviesNavigationRoute = "for_you_route/{$POPULAR_MOVIES_RESOURCE_ID}"
 private const val DEEP_LINK_URI_PATTERN =
-    "https://www.nowinandroid.apps.samples.google.com/foryou/{$LINKED_NEWS_RESOURCE_ID}"
+    "https://www.nowinandroid.apps.samples.google.com/foryou/{$POPULAR_MOVIES_RESOURCE_ID}"
 
 fun NavController.navigateToPopularMovies(navOptions: NavOptions? = null) {
     this.navigate(popularMoviesNavigationRoute, navOptions)
@@ -25,7 +25,7 @@ fun NavGraphBuilder.popularMoviesScreen(onMovieClick: (Int) -> Unit) {
             navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
         ),
         arguments = listOf(
-            navArgument(LINKED_NEWS_RESOURCE_ID) { type = NavType.StringType },
+            navArgument(POPULAR_MOVIES_RESOURCE_ID) { type = NavType.StringType },
         ),
     ) {
         PopularMoviesRoute(onMovieClick)

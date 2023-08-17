@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="description">Description</string>
+    <string name="director">Director</string>
+    <string name="cast">Cast</string>
+    <string name="reviews">Reviews</string>
+    <string name="similar_movies">Similar Movies</string>
+</resources>

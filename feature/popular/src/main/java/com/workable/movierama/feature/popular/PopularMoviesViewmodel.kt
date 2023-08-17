@@ -9,17 +9,14 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.workable.core.data.repository.MoviesRepository
 import com.workable.movierama.core.domain.usecase.FormatDateUseCase
-import com.workable.movierama.core.model.Movie
+import com.workable.movierama.core.model.MovieSummary
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
 class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : ViewModel() {
@@ -31,17 +28,10 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
         moviesRepository.getPopularMoviesPagingSource()
     }.flow.cachedIn(viewModelScope)
     private fun searchedMovies(query: String) = Pager(PagingConfig(pageSize = 10)) {
-        moviesRepository.getSearchResults(query)
+        moviesRepository.getSearchResultsPagingSource(query)
     }.flow.cachedIn(viewModelScope)
 
     private val _searchQuery = MutableStateFlow<String>("")
-
-//    val test: Flow<PagingData<Movie>> = _searchQuery.transformLatest { query ->
-//        if (query.isNullOrEmpty())
-//            popularMovies
-//        else
-//
-//    }
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState = _searchQuery
@@ -65,7 +55,7 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
         }
 
 
-    private fun applyEvent(pagingData: PagingData<Movie>, viewEvent: ViewEvent): PagingData<Movie> {
+    private fun applyEvent(pagingData: PagingData<MovieSummary>, viewEvent: ViewEvent): PagingData<MovieSummary> {
         return when (viewEvent) {
             ViewEvent.None -> pagingData
             is ViewEvent.EditFavourite -> {
@@ -94,7 +84,7 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
 
 sealed interface MovieUiState {
     data class Content(
-        val movies : List<Movie>
+        val movieSummaries : List<MovieSummary>
     ) : MovieUiState
 
     object Loading : MovieUiState
@@ -105,7 +95,7 @@ sealed interface ViewEvent {
     object None : ViewEvent
 }
 
-val testMovie = Movie(
+val testMovieSummary = MovieSummary(
     id = -1,
     title = "Movie Title",
     posterUrl = "https://placehold.co/600x400",

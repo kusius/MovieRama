@@ -1,6 +1,6 @@
 package com.workable.movierama.core.model
 
-data class Movie(
+data class MovieSummary(
     val id: Int,
     val posterUrl: String,
     val title: String,

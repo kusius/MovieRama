@@ -2,7 +2,7 @@ package com.workable.core.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.workable.movierama.core.model.Movie
+import com.workable.movierama.core.model.MovieSummary
 import com.workable.movierama.core.network.MovieNetworkDataSource
 import com.workable.movierama.core.network.model.NetworkMovie
 import com.workable.movierama.core.network.model.asExternalModel
@@ -12,11 +12,11 @@ data class SearchPagingKey(
     val page: Int
 )
 
-class SearchPagingSource(private val query:String, private val networkDataSource: MovieNetworkDataSource) :
-    PagingSource<SearchPagingKey, Movie>() {
-    override fun getRefreshKey(state: PagingState<SearchPagingKey, Movie>): SearchPagingKey? = null
+class SearchPagingSource(private val query: String, private val networkDataSource: MovieNetworkDataSource) :
+    PagingSource<SearchPagingKey, MovieSummary>() {
+    override fun getRefreshKey(state: PagingState<SearchPagingKey, MovieSummary>): SearchPagingKey? = null
 
-    override suspend fun load(params: LoadParams<SearchPagingKey>): LoadResult<SearchPagingKey, Movie> {
+    override suspend fun load(params: LoadParams<SearchPagingKey>): LoadResult<SearchPagingKey, MovieSummary> {
         return try {
             // load page 1 if undefined
             val nextPageKey = params.key ?: SearchPagingKey(query = query, page = 1)

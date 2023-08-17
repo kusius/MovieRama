@@ -2,6 +2,7 @@ package com.workable.movierama
 
 import android.app.Application
 import com.workable.core.data.di.repositoryModule
+import com.workable.feature.details.di.movieDetailsViewmodelModule
 import com.workable.movierama.feature.popular.di.popularViewModelModule
 import org.koin.core.context.startKoin
 
@@ -11,7 +12,8 @@ class MovieRamaApplication : Application() {
         startKoin {
             modules(
                 repositoryModule,
-                popularViewModelModule
+                popularViewModelModule,
+                movieDetailsViewmodelModule
             )
         }
     }

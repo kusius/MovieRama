@@ -3,6 +3,8 @@ package com.workable.movierama.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import com.workable.feature.details.navigation.movieDetailsScreen
+import com.workable.feature.details.navigation.navigateToPopularMovies
 import com.workable.movierama.feature.popular.navigation.popularMoviesNavigationRoute
 import com.workable.movierama.feature.popular.navigation.popularMoviesScreen
 import com.workable.movierama.ui.MovieRamaAppState
@@ -20,7 +22,12 @@ fun MovieRamaNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        // todo: open details for clicked movie
-        popularMoviesScreen(onMovieClick = {})
+        popularMoviesScreen(onMovieClick = { movieId ->
+            navController.navigateToPopularMovies(movieIdArg = movieId)
+        })
+
+        movieDetailsScreen(
+            navController = appState.navController
+        )
     }
 }
