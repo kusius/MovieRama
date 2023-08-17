@@ -4,6 +4,7 @@ import com.workable.movierama.core.model.MovieDetails
 import com.workable.movierama.core.model.MovieGenre
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class NetworkMovieDetails(
@@ -16,8 +17,10 @@ data class NetworkMovieDetails(
     @SerialName("release_date")
     val releaseDate: String,
     @SerialName("backdrop_path")
-    val backdropUrl: String,
+    private val backdropPath: String = "",
 
+    @Transient
+    val backdropUrl: String = "${IMAGE_BASE_URL}${backdropPath}",
     val overview: String,
     val credits: NetworkMovieCredits,
 )

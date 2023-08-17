@@ -4,7 +4,6 @@ import com.workable.movierama.core.model.MovieSummary
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original"
 @Serializable
 data class NetworkMovie(
     val id: Int,

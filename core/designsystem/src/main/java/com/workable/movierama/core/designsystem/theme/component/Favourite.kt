@@ -25,12 +25,12 @@ fun MovieRamaFavouriteButton(isFavourite: Boolean, onFavouriteChanged: (Boolean)
         },
         modifier = modifier) {
         val tint by animateColorAsState(
-            if (isFavourite) colorResource(id = R.color.favourite) else colorResource(
+            if (favourite) colorResource(id = R.color.favourite) else colorResource(
                 id = R.color.not_favourite
             )
         )
         Icon(
-            imageVector = if (isFavourite) {
+            imageVector = if (favourite) {
                 Icons.Filled.Favorite
             } else {
                 Icons.Default.Favorite

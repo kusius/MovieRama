@@ -33,13 +33,6 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
 
     private val _searchQuery = MutableStateFlow<String>("")
 
-//    val test: Flow<PagingData<Movie>> = _searchQuery.transformLatest { query ->
-//        if (query.isNullOrEmpty())
-//            popularMovies
-//        else
-//
-//    }
-
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState = _searchQuery
         // only trigger search query if value not changed within 500ms in order to not overwhelm the

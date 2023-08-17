@@ -26,16 +26,53 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = libs.versions.jvmTarget.get()
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
     }
 }
 
 dependencies {
+    implementation libs.androidx.core.ktx
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+    implementation(project(":core:domain"))
+    implementation(platform(libs.androidx.compose.bom))
+    implementation libs.androidx.compose.ui
+    implementation libs.androidx.compose.ui.graphics
+    implementation libs.androidx.compose.ui.tooling.preview
+    implementation libs.androidx.compose.material3
+    implementation libs.coil.compose
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.paging.runtime
+    implementation libs.androidx.paging.compose
+    implementation libs.koin.core
+    implementation libs.koin.android
+    implementation libs.koin.compose
+    implementation libs.koin.androidx.compose
+    implementation libs.androidx.navigation.compose
+    implementation libs.gowtham.compose.ratingbar
+    implementation libs.androidx.compose.ui.tooling
+    implementation libs.androidx.lifecycle.runtime.compose
 
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation libs.junit4
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.kotlin.test
+    testImplementation libs.androidx.test.ext
+    testImplementation libs.androidx.paging.testing
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation libs.kotlin.test
+    androidTestImplementation libs.androidx.test.ext
+    androidTestImplementation libs.androidx.paging.testing
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation libs.androidx.compose.ui.test.junit4
+
+    debugImplementation libs.androidx.compose.ui.tooling
+    debugImplementation libs.androidx.compose.ui.test.manifest
 }

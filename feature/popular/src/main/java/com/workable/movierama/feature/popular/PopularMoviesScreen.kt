@@ -1,5 +1,6 @@
 package com.workable.movierama.feature.popular
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +75,6 @@ fun MoviesScreen(
     }
 
     val state = rememberPullRefreshState(refreshing, ::refresh)
-
     var searchQuery by remember { mutableStateOf("") }
     fun search(query: String) {
         searchQuery = query
@@ -106,7 +106,9 @@ fun MoviesScreen(
                             onFavouriteChanged = { isFavourite ->
                                 onFavouriteChanged(item.id, isFavourite)
                             },
-                            modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))
+                            modifier = modifier
+                                .padding(dimensionResource(designR.dimen.padding_small))
+                                .clickable(onClick = {onMovieClick(item.id)})
                         )
                 }
 
@@ -136,7 +138,39 @@ fun MoviesScreen(
 }
 
 @Composable
-fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> kotlin.Unit, modifier: Modifier = Modifier) {
+fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Column {
+            Text(
+                text = movieSummary.title,
+                style = MaterialTheme.typography.displayMedium
+            )
+            Row() {
+                MovieRamaRating(rating = movieSummary.ratingOutOf10 / 2, modifier = Modifier.align(
+                    Alignment.CenterVertically))
+                Text(
+                    text = movieSummary.releaseDate,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier
+                        .padding(start = dimensionResource(id = com.workable.movierama.core.designsystem.R.dimen.padding_small))
+                        .align(Alignment.CenterVertically)
+                )
+            }
+        }
+        Spacer(modifier = modifier.weight(1f))
+        MovieRamaFavouriteButton(
+            isFavourite = movieSummary.isFavourite,
+            onFavouriteChanged = onFavouriteChange,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+    }
+}
+
+@Composable
+fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = modifier
@@ -158,37 +192,6 @@ fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> kotli
                     modifier = modifier)
             }
         }
-    }
-}
-
-@Composable
-fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Column {
-            Text(
-                text = movieSummary.title,
-                style = MaterialTheme.typography.displayMedium
-            )
-            Row() {
-                MovieRamaRating(rating = movieSummary.ratingOutOf10 / 2, modifier = Modifier.align(Alignment.CenterVertically))
-                Text(
-                    text = movieSummary.releaseDate,
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier
-                        .padding(start = dimensionResource(id = com.workable.movierama.core.designsystem.R.dimen.padding_small))
-                        .align(Alignment.CenterVertically)
-                )
-            }
-        }
-        Spacer(modifier = modifier.weight(1f))
-        MovieRamaFavouriteButton(
-            isFavourite = movieSummary.isFavourite,
-            onFavouriteChanged = onFavouriteChange,
-            modifier = Modifier.align(Alignment.CenterVertically)
-        )
     }
 }
 

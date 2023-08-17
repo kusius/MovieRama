@@ -55,10 +55,15 @@ class OnlineFirstMoviesRepository(
         val reviews = reviewsDeferred.await()
 
         return@withContext MovieDetails(
-            id = details.id,
+            summary = MovieSummary(
+                id = details.id,
+                title = details.title,
+                posterUrl = details.backdropUrl,
+                isFavourite = favouriteMovies.contains(details.id),
+                releaseDate = details.releaseDate,
+                ratingOutOf10 = details.rating
+            ),
             genres = details.genres.map(NetworkMovieGenre::asExternalModel),
-            title = details.title,
-            posterUrl = details.backdropUrl,
             overview = details.overview,
             directorName = details.credits.crew.find {
                 it.job.equals(
@@ -68,7 +73,6 @@ class OnlineFirstMoviesRepository(
             }?.name ?: "",
             castNames = details.credits.cast.map { it.name },
             reviews = reviews.map(NetworkMovieReview::asExternalModel),
-            isFavourite = favouriteMovies.contains(details.id)
         )
     }
 }
