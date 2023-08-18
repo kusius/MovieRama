@@ -18,6 +18,7 @@ class FakeMovieNetworkDataSource : MovieNetworkDataSource {
                         title = "Movie ${id}",
                         rating = 5.0f,
                         releaseDate = "11/11/11",
+                        popularity = 1f,
                     )
                 )
             }
@@ -35,6 +36,7 @@ class FakeMovieNetworkDataSource : MovieNetworkDataSource {
                         title = "Movie ${id}",
                         rating = 5.0f,
                         releaseDate = "22/11/11",
+                        popularity = 1f,
                     )
                 )
             }

@@ -36,6 +36,7 @@ dependencies {
     implementation libs.koin.core
     implementation(project(":core:model"))
     implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation libs.androidx.core.ktx
     testImplementation libs.junit4
     testImplementation libs.kotlinx.coroutines.test

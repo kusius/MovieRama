@@ -37,7 +37,8 @@ class PopularMoviesScreenTest {
                 MoviesScreen(
                     onMovieClick = {},
                     onFavouriteChanged = {_, _ -> } ,
-                    lazyPagingItems = pagingDataFlow.collectAsLazyPagingItems()
+                    lazyPagingItems = pagingDataFlow.collectAsLazyPagingItems(),
+                    onSearchQueryChanged = {}
                 )
             }
         }

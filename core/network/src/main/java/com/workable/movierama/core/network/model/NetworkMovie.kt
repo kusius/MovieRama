@@ -8,13 +8,15 @@ import kotlinx.serialization.Serializable
 data class NetworkMovie(
     val id: Int,
     @SerialName("backdrop_path")
-    val backdropUrl: String?,
+    private val backdropPath: String? = "",
+    val backdropUrl: String = "${IMAGE_BASE_URL}${backdropPath}" ,
     @SerialName("title")
     val title: String,
     @SerialName("vote_average")
     val rating: Float,
     @SerialName("release_date")
     val releaseDate: String,
+    val popularity: Float,
 )
 
 fun NetworkMovie.asExternalModel(): MovieSummary =

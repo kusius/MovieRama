@@ -17,7 +17,7 @@ data class NetworkMovieDetails(
     @SerialName("release_date")
     val releaseDate: String,
     @SerialName("backdrop_path")
-    private val backdropPath: String = "",
+    private val backdropPath: String? = "",
 
     @Transient
     val backdropUrl: String = "${IMAGE_BASE_URL}${backdropPath}",

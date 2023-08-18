@@ -6,6 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.workable.core.data.repository.MoviesRepository
+import com.workable.core.data.repository.PagingMoviesRepository
 import com.workable.movierama.core.domain.usecase.FormatDateUseCase
 import com.workable.movierama.core.model.MovieDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,17 +44,15 @@ class MovieDetailsViewmodel(val moviesRepository: MoviesRepository) : ViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val similarMovies = _movieId.flatMapMerge { movieId ->
-        Pager(PagingConfig(pageSize = 10)) {
-            moviesRepository.getSimilarMoviesPagingSource(movieId)
-        }.flow.cachedIn(viewModelScope)
+        moviesRepository.getSimilarMoviesPagingSource(movieId)
     }
 
     fun getMovieDetails(movieId: Int) = viewModelScope.launch {
         _movieId.value = movieId
     }
 
-    fun markFavourite(movieId: Int, isFavourite: Boolean) {
-        // todo
+    fun markFavourite(movieId: Int, isFavourite: Boolean) = viewModelScope.launch {
+        moviesRepository.markFavourite(movieId = movieId, isFavourite = isFavourite)
     }
 
 }

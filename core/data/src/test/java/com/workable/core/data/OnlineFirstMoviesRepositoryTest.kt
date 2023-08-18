@@ -112,6 +112,6 @@ class OnlineFirstMoviesRepositoryTest : KoinTest {
     fun repository_combines_movie_details() = runTest(testDispatcher) {
         val movieId = 42
         val movieDetails = subject.getMovieDetails(movieId = movieId)
-        assertEquals(movieId, movieDetails.id)
+        assertEquals(movieId, movieDetails.summary.id)
     }
 }

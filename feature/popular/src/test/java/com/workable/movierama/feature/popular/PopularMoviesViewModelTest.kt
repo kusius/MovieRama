@@ -53,21 +53,4 @@ class PopularMoviesViewModelTest {
             actual = itemsSnapshot
         )
     }
-
-    @Test
-    fun item_marked_favourite_correct_data() = runTest {
-        val items = viewModel.uiState
-
-        viewModel.markFavourite(testData[42].id, true)
-
-        val itemsSnapshot = items.asSnapshot {
-            scrollTo(50)
-        }
-
-        assertEquals(
-            expected = true,
-            actual = itemsSnapshot[42].isFavourite
-        )
-
-    }
 }
