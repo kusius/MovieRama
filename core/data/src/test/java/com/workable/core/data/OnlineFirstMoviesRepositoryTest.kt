@@ -94,10 +94,7 @@ class OnlineFirstMoviesRepositoryTest : KoinTest {
         repeat(10) { index ->
             val nextResult = pagingSource.load(
                 params = PagingSource.LoadParams.Append(
-                    key = SimilarMoviesPagingKey(
-                        movieId = movieId,
-                        page = index
-                    ), loadSize = 5, true
+                    key = index, loadSize = 5, true
                 )
             )
             assertIs<PagingSource.LoadResult.Page<SimilarMoviesPagingKey, MovieSummary>>(nextResult)

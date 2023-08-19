@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.test.platform.app.InstrumentationRegistry
 import com.workable.movierama.feature.popular.fake.createLoadingPagingDataFlow
+import kotlinx.coroutines.flow.flow
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Rule
@@ -38,7 +39,8 @@ class PopularMoviesScreenTest {
                     onMovieClick = {},
                     onFavouriteChanged = {_, _ -> } ,
                     lazyPagingItems = pagingDataFlow.collectAsLazyPagingItems(),
-                    onSearchQueryChanged = {}
+                    onSearchQueryChanged = {},
+                    searchQuery = ""
                 )
             }
         }

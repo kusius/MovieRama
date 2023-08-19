@@ -21,6 +21,7 @@ import org.koin.core.component.inject
 private const val REMOTE_KEY_LABEL = "MoviesRemoteKey"
 @OptIn(ExperimentalPagingApi::class)
 class MoviesRemoteMediator(
+    private val query: String,
     private val database: MovieRamaDatabase,
     private val network: MovieNetworkDataSource
 ) : RemoteMediator<Int, MovieEntity>() {
@@ -54,7 +55,10 @@ class MoviesRemoteMediator(
                     remoteKey.nextKey!!
                 }
             }
-            val networkResponse = network.getPopularMovies(loadKey)
+
+            val networkResponse =
+                if (query.isEmpty() || query.isBlank()) network.getPopularMovies(loadKey)
+                else network.searchMovies(query, loadKey)
 
             val entities = networkResponse.map { networkMovie ->
                 val storedMovie = movieDao.getMovieById(networkMovie.id)
@@ -65,14 +69,14 @@ class MoviesRemoteMediator(
             // store received data into database
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    movieDao.deleteAll()
+//                    movieDao.deleteAll()
                     remoteKeyDao.deleteByQuery(REMOTE_KEY_LABEL)
                 }
                 // Update RemoteKey for this query.
 
                 remoteKeyDao.insertOrReplace(
                     RemoteKeyEntity(
-                        REMOTE_KEY_LABEL, nextKey = loadKey + 1
+                        REMOTE_KEY_LABEL, nextKey = if(networkResponse.isEmpty()) null else loadKey + 1
                     )
                 )
                 movieDao.insertAll(entities)

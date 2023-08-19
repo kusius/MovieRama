@@ -11,14 +11,11 @@ import com.workable.movierama.core.model.MovieSummary
 import kotlinx.coroutines.flow.Flow
 
 class FakeMoviesRepository(private val testData: List<MovieSummary>): MoviesRepository {
-    override fun getPopularMoviesPagingSource(): Flow<PagingData<MovieSummary>> {
+
+    override fun getMoviesByQuery(query: String): Flow<PagingData<MovieSummary>> {
         return Pager(config = PagingConfig(pageSize = 10)){
             FakeMoviesPagingSource(testData)
         }.flow
-    }
-
-    override fun searchMoviesMoviesPagingSource(query: String): Flow<PagingData<MovieSummary>> {
-        TODO("Not yet implemented")
     }
 
     override fun getSimilarMoviesPagingSource(movieId: Int): Flow<PagingData<MovieSummary>> {

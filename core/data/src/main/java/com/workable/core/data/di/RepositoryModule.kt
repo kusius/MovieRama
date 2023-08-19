@@ -25,7 +25,7 @@ val repositoryModule = module {
         OfflineFirstMoviesRepository(
             networkDataSource = get(),
             movieDao = get(),
-            moviesRemoteMediator = MoviesRemoteMediator(database = get(), network = get()),
+            moviesRemoteMediator = MoviesRemoteMediator(database = get(), network = get(), query = ""),
             ioDispatcher = get(named(IO_DISPATCHER)),
             database = get()
         )

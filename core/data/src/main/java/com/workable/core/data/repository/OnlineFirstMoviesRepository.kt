@@ -2,10 +2,8 @@ package com.workable.core.data.repository
 
 import androidx.paging.PagingSource
 import com.workable.core.data.paging.MoviesPagingSource
-import com.workable.core.data.paging.PersistentSearchPagingSource
 import com.workable.core.data.paging.SearchPagingKey
 import com.workable.core.data.paging.SearchPagingSource
-import com.workable.core.data.paging.SimilarMoviesPagingKey
 import com.workable.core.data.paging.SimilarMoviesPagingSource
 import com.workable.movierama.core.model.MovieDetails
 import com.workable.movierama.core.model.MovieSummary
@@ -27,10 +25,10 @@ class OnlineFirstMoviesRepository(
     }
 
     override fun getSearchResultsPagingSource(query: String): PagingSource<SearchPagingKey, MovieSummary> {
-        return PersistentSearchPagingSource(query, networkDataSource)
+        return SearchPagingSource(query, networkDataSource)
     }
 
-    override fun getSimilarMoviesPagingSource(movieId: Int): PagingSource<SimilarMoviesPagingKey, MovieSummary> {
+    override fun getSimilarMoviesPagingSource(movieId: Int): PagingSource<Int, MovieSummary> {
         return SimilarMoviesPagingSource(movieId = movieId, networkDataSource)
     }
 

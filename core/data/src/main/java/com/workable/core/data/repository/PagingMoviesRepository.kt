@@ -15,14 +15,12 @@ interface PagingMoviesRepository {
 
     suspend fun getMovieDetails(movieId: Int): MovieDetails
 
-    fun getSimilarMoviesPagingSource(movieId: Int) : PagingSource<SimilarMoviesPagingKey, MovieSummary>
+    fun getSimilarMoviesPagingSource(movieId: Int) : PagingSource<Int, MovieSummary>
 }
 
 
 interface MoviesRepository {
-    fun getPopularMoviesPagingSource() : Flow<PagingData<MovieSummary>>
-
-    fun searchMoviesMoviesPagingSource(query: String) : Flow<PagingData<MovieSummary>>
+    fun getMoviesByQuery(query: String): Flow<PagingData<MovieSummary>>
 
     fun getSimilarMoviesPagingSource(movieId: Int) : Flow<PagingData<MovieSummary>>
     suspend fun markFavourite(movieId: Int, isFavourite: Boolean)

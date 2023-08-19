@@ -17,21 +17,21 @@ data class SimilarMoviesPagingKey(
 class SimilarMoviesPagingSource(
     private val movieId: Int,
     private val networkDataSource: MovieNetworkDataSource
-) : PagingSource<SimilarMoviesPagingKey, MovieSummary>() {
-    override fun getRefreshKey(state: PagingState<SimilarMoviesPagingKey, MovieSummary>): SimilarMoviesPagingKey? {
+) : PagingSource<Int, MovieSummary>() {
+    override fun getRefreshKey(state: PagingState<Int, MovieSummary>): Int? {
        return null
     }
 
-    override suspend fun load(params: LoadParams<SimilarMoviesPagingKey>): LoadResult<SimilarMoviesPagingKey, MovieSummary> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieSummary> {
         return try {
             // load page 1 if undefined
-            val nextPageKey = params.key ?: SimilarMoviesPagingKey(movieId = movieId, page = 1)
+            val nextPageKey = params.key ?: 1
             val response =
-                networkDataSource.getMovieSimilar(id = nextPageKey.movieId, page = nextPageKey.page)
+                networkDataSource.getMovieSimilar(id = movieId, page = nextPageKey)
             LoadResult.Page(
                 data = response.map(NetworkMovie::asExternalModel),
                 prevKey = null,
-                nextKey = nextPageKey.copy(page = nextPageKey.page + 1)
+                nextKey = if (response.isEmpty()) null else nextPageKey + 1
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
