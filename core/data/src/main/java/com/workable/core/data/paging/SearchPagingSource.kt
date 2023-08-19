@@ -25,7 +25,8 @@ class SearchPagingSource(private val query: String, private val networkDataSourc
             LoadResult.Page(
                 data = response.map(NetworkMovie::asExternalModel),
                 prevKey = null,
-                nextKey = nextPageKey.copy(page = nextPageKey.page + 1)
+                nextKey = if (response.isEmpty()) null else
+                    nextPageKey.copy(page = nextPageKey.page + 1)
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
