@@ -10,7 +10,9 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_30" value="120" />
+                  <entry key="R58N909MLTL" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung&#10; SM-G715FN" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -62,7 +64,9 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_30" value="120" />
+                  <entry key="R58N909MLTL" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung&#10; SM-G715FN" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -115,6 +119,20 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_2_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="2034930828">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="R58N909MLTL" value="120" />
+                  <entry key="Tests" value="360" />
+                  <entry key="samsung&#10; SM-G715FN" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

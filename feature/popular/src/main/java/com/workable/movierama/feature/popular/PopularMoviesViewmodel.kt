@@ -14,6 +14,7 @@ import com.workable.movierama.core.model.MovieSummary
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapMerge
@@ -22,8 +23,8 @@ import kotlinx.coroutines.launch
 
 class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : ViewModel() {
     val formatDateUseCase = FormatDateUseCase()
-    private val _popularMovies = moviesRepository.getPopularMoviesPagingSource().cachedIn(viewModelScope)
     private val _searchQuery = MutableStateFlow<String>("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState =
@@ -33,8 +34,7 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
         .debounce(500L)
         // the source of data is either the paged search results, or the popular movies
         .flatMapMerge { query ->
-            if (query.isEmpty() || query.isBlank()) _popularMovies
-            else moviesRepository.searchMoviesMoviesPagingSource(query).cachedIn(viewModelScope)
+            moviesRepository.getMoviesByQuery(query)
         }
         .map { pagingData ->
             pagingData.map { movie ->
@@ -57,7 +57,7 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
 
 val testMovieSummary = MovieSummary(
     id = -1,
-    title = "Movie Title",
+    title = "Spider-Man:",
     posterUrl = "https://placehold.co/600x400",
     isFavourite = true,
     releaseDate = "6 Jun 1934",

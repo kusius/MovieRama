@@ -1,12 +1,14 @@
 package com.workable.movierama.feature.popular
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
@@ -15,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,6 +44,7 @@ import com.workable.movierama.core.designsystem.theme.component.pullrefresh.Pull
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.pullRefresh
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.rememberPullRefreshState
 import com.workable.movierama.core.model.MovieSummary
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import com.workable.movierama.core.designsystem.R as designR
@@ -51,11 +55,13 @@ internal fun PopularMoviesRoute(
     viewModel: PopularMoviesViewmodel = koinViewModel()
 ) {
     val lazyPagingItems = viewModel.uiState.collectAsLazyPagingItems()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     MoviesScreen(
         onMovieClick = onMovieClick,
         onFavouriteChanged = viewModel::markFavourite,
         onSearchQueryChanged = viewModel::searchMovies,
-        lazyPagingItems = lazyPagingItems
+        lazyPagingItems = lazyPagingItems,
+        searchQuery = searchQuery,
     )
 }
 
@@ -65,24 +71,23 @@ fun MoviesScreen(
     onFavouriteChanged: (Int, Boolean) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     lazyPagingItems: LazyPagingItems<MovieSummary>,
+    searchQuery: String,
     modifier: Modifier = Modifier
 ) {
     val refreshScope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(lazyPagingItems.loadState.refresh == LoadState.Loading) }
-
     fun refresh() = refreshScope.launch {
         lazyPagingItems.refresh()
     }
 
     val state = rememberPullRefreshState(refreshing, ::refresh)
-    var searchQuery by remember { mutableStateOf("") }
     fun search(query: String) {
-        searchQuery = query
-        onSearchQueryChanged(searchQuery)
+        onSearchQueryChanged(query)
     }
 
     Column(modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))) {
         MovieRamaSearchBar(
+            searchQuery = searchQuery,
             onQueryChanged = ::search,
             onSearch = ::search,
             placeholder = { Text(text = stringResource(R.string.search_hint)) },
@@ -108,7 +113,7 @@ fun MoviesScreen(
                             },
                             modifier = modifier
                                 .padding(dimensionResource(designR.dimen.padding_small))
-                                .clickable(onClick = {onMovieClick(item.id)})
+                                .clickable(onClick = { onMovieClick(item.id) })
                         )
                 }
 
@@ -139,14 +144,18 @@ fun MoviesScreen(
 
 @Composable
 fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
+    val smallPadding = dimensionResource(designR.dimen.padding_small)
+    Row(modifier = Modifier
+        .padding(
+            start = smallPadding,
+            top = smallPadding
+        ),
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = movieSummary.title,
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+
             )
             Row() {
                 MovieRamaRating(rating = movieSummary.ratingOutOf10 / 2, modifier = Modifier.align(
@@ -160,11 +169,12 @@ fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) ->
                 )
             }
         }
-        Spacer(modifier = modifier.weight(1f))
         MovieRamaFavouriteButton(
             isFavourite = movieSummary.isFavourite,
             onFavouriteChanged = onFavouriteChange,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier
+                .size(dimensionResource(id = R.dimen.favourite_button_size))
+                .align(Alignment.CenterVertically)
         )
     }
 }
@@ -173,7 +183,7 @@ fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) ->
 fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ){
         Column(modifier = Modifier){
             AsyncImage(
@@ -183,9 +193,7 @@ fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit,
                 contentScale = ContentScale.Crop,
                 contentDescription = null
             )
-            Row(modifier = modifier
-                .fillMaxWidth()
-            ) {
+            Row() {
                 MovieInformation(
                     movieSummary = movieSummary,
                     onFavouriteChange = onFavouriteChanged,

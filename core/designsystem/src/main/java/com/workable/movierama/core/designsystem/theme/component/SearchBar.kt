@@ -30,12 +30,13 @@ import com.workable.movierama.core.designsystem.R
 
 @Composable
 fun MovieRamaSearchBar(
+    searchQuery: String,
     onQueryChanged: (String) -> Unit,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
 ) {
-    var queryString by remember { mutableStateOf("") }
+    var queryString by remember { mutableStateOf(searchQuery) }
     val focusManager = LocalFocusManager.current
     fun queryChanged(query: String) {
         queryString = query
@@ -82,7 +83,8 @@ fun MovieRamaSearchBar(
 @Composable
 fun PreviewSearchBar() {
     MaterialTheme() {
-        MovieRamaSearchBar(onQueryChanged = {}, onSearch = {},
+        MovieRamaSearchBar(
+            searchQuery = "", onQueryChanged = {}, onSearch = {},
             placeholder = { Text(text = "Enter your search ") }
         )
     }
