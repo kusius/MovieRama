@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,7 +56,8 @@ internal fun PopularMoviesRoute(
         onMovieClick = onMovieClick,
         onFavouriteChanged = viewModel::markFavourite,
         onSearchQueryChanged = viewModel::searchMovies,
-        lazyPagingItems = lazyPagingItems
+        lazyPagingItems = lazyPagingItems,
+        viewModel = viewModel
     )
 }
 
@@ -65,24 +67,24 @@ fun MoviesScreen(
     onFavouriteChanged: (Int, Boolean) -> Unit,
     onSearchQueryChanged: (String) -> Unit,
     lazyPagingItems: LazyPagingItems<MovieSummary>,
+    viewModel: PopularMoviesViewmodel,
     modifier: Modifier = Modifier
 ) {
     val refreshScope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(lazyPagingItems.loadState.refresh == LoadState.Loading) }
-
+    val searchQuery by viewModel.searchQuery.collectAsState()
     fun refresh() = refreshScope.launch {
         lazyPagingItems.refresh()
     }
 
     val state = rememberPullRefreshState(refreshing, ::refresh)
-    var searchQuery by remember { mutableStateOf("") }
     fun search(query: String) {
-        searchQuery = query
-        onSearchQueryChanged(searchQuery)
+        onSearchQueryChanged(query)
     }
 
     Column(modifier = modifier.padding(dimensionResource(designR.dimen.padding_small))) {
         MovieRamaSearchBar(
+            searchQuery = searchQuery,
             onQueryChanged = ::search,
             onSearch = ::search,
             placeholder = { Text(text = stringResource(R.string.search_hint)) },

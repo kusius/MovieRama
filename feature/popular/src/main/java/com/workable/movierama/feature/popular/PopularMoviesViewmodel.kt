@@ -14,6 +14,7 @@ import com.workable.movierama.core.model.MovieSummary
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapMerge
@@ -24,6 +25,7 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
     val formatDateUseCase = FormatDateUseCase()
     private val _popularMovies = moviesRepository.getPopularMoviesPagingSource().cachedIn(viewModelScope)
     private val _searchQuery = MutableStateFlow<String>("")
+    val searchQuery: StateFlow<String> = _searchQuery
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState =
