@@ -32,7 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
@@ -44,6 +46,8 @@ import com.workable.movierama.core.designsystem.theme.component.pullrefresh.Pull
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.pullRefresh
 import com.workable.movierama.core.designsystem.theme.component.pullrefresh.rememberPullRefreshState
 import com.workable.movierama.core.model.MovieSummary
+import com.workable.movierama.feature.popular.preview.MoviesPreviewParameterProvider
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -193,7 +197,7 @@ fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit,
                 contentScale = ContentScale.Crop,
                 contentDescription = null
             )
-            Row() {
+            Row {
                 MovieInformation(
                     movieSummary = movieSummary,
                     onFavouriteChange = onFavouriteChanged,
@@ -205,7 +209,23 @@ fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit,
 
 @Preview(showBackground = true)
 @Composable
-fun PopularMoviesScreenPreview() {
+fun PopularMoviesScreenPreview(
+    @PreviewParameter(MoviesPreviewParameterProvider::class) movies: MutableStateFlow<PagingData<MovieSummary>>
+) {
+    MovieRamaTheme {
+        MoviesScreen(
+            onMovieClick = {},
+            onFavouriteChanged = { _, _ -> },
+            onSearchQueryChanged = {},
+            lazyPagingItems = movies.collectAsLazyPagingItems(),
+            searchQuery = ""
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MovieItemPreview() {
     MovieRamaTheme {
         MovieItem(
             movieSummary = testMovieSummary,
