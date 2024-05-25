@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.movierama'
+    namespace 'com.kusius.movies'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.workable.movierama"
+        applicationId "com.kusius.movies"
         minSdk 26
         targetSdk 33
         versionCode 1

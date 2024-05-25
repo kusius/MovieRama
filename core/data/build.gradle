@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.movierama.core.data'
+    namespace 'com.kusius.movies.core.data'
     compileSdk 33
 
     defaultConfig {

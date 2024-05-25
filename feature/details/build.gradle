@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.feature.details'
+    namespace 'com.kusius.movies.feature.details'
     compileSdk 33
 
     defaultConfig {

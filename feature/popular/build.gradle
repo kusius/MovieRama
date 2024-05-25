@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.workable.movierama.feature.popular'
+    namespace 'com.kusius.movies.feature.popular'
     compileSdk 33
 
     defaultConfig {
