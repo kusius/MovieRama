@@ -2,6 +2,7 @@ package com.kusius.movies.database
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.withTransaction
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.kusius.movies.database.dao.MovieDao
@@ -49,18 +50,37 @@ class MovieDetailsTest {
                 movieId = movie.movieId
             )
         }
+        val reviews = TestUtil.createReviewsForMovie(reviewNumber = 10, movie = movie)
 
-        movieDao.insertAll(listOf((movie)))
-        movieDao.insertCast(cast)
-        movieDao.insertCrew(crew)
-        movieDao.insertGenres(genres)
-        movieDao.associateMovieGenres(movieWithGenres)
+        db.withTransaction {
+            movieDao.insertAll(listOf((movie)))
+            movieDao.insertCast(cast)
+            movieDao.insertCrew(crew)
+            movieDao.insertGenres(genres)
+            movieDao.associateMovieGenres(movieWithGenres)
+            movieDao.insertReview(reviews)
+        }
 
         val movieDetails = movieDao.getMovieDetails(movie.movieId)
         assertThat(movieDetails.movie, equalTo(movie))
         assertEquals(crew.size, movieDetails.crew.size)
         assertEquals(cast.size, movieDetails.cast.size)
         assertEquals(movieWithGenres.size, movieDetails.genres.size)
+        assertEquals(reviews.size, movieDetails.reviews.size)
+    }
+
+    @Test
+    fun movieDetailsNotAvailableShouldBeEmpty() = runTest {
+        val movie = TestUtil.createMovie(1).first()
+
+        movieDao.insertAll(listOf((movie)))
+
+        val movieDetails = movieDao.getMovieDetails(movie.movieId)
+        assertThat(movieDetails.movie, equalTo(movie))
+        assertEquals(0, movieDetails.crew.size)
+        assertEquals(0, movieDetails.cast.size)
+        assertEquals(0, movieDetails.genres.size)
+        assertEquals(0, movieDetails.reviews.size)
     }
 
 }

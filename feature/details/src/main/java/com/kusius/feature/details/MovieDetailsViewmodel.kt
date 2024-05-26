@@ -8,30 +8,34 @@ import com.kusius.movies.core.model.MovieDetails
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 
 class MovieDetailsViewmodel(val moviesRepository: MoviesRepository) : ViewModel() {
     val formatDateUseCase = FormatDateUseCase()
-    // contains the marked favourite movies. This will be replaced when persistence is added
-    // since source of truth will be it and propagate through the repository
-    private val viewEventsFlow = MutableStateFlow<List<ViewEvent>>(emptyList())
     private val _movieId = MutableStateFlow<Int>(-1)
 
-    val movieDetails = _movieId.map { movieId ->
+    val movieDetails: StateFlow<MovieDetailsUiState> = _movieId.transform { movieId ->
         if (movieId >= 0) {
-            val movieDetails = moviesRepository.getMovieDetails(movieId)
-            val summary = movieDetails.summary
-            MovieDetailsUiState.Content(
-                movieDetails.copy(
-                    summary = summary.copy(releaseDate = formatDateUseCase(summary.releaseDate))
-                )
+            val movieDetailsFlow = moviesRepository.getMovieDetailsFlow(movieId)
+
+            emitAll(movieDetailsFlow.map { movieDetails ->
+                    val summary = movieDetails.summary
+                    MovieDetailsUiState.Content(
+                        movieDetails.copy(
+                            summary = summary.copy(releaseDate = formatDateUseCase(summary.releaseDate))
+                        )
+                    )
+                }
             )
+        } else {
+            emit(MovieDetailsUiState.Loading)
         }
-        else
-            MovieDetailsUiState.Loading
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),

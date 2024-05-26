@@ -4,6 +4,7 @@ import com.kusius.movies.database.model.CastEntity
 import com.kusius.movies.database.model.CrewEntity
 import com.kusius.movies.database.model.GenreEntity
 import com.kusius.movies.database.model.MovieEntity
+import com.kusius.movies.database.model.ReviewEntity
 
 object TestUtil {
     fun createMovie(amount: Int): List<MovieEntity> {
@@ -36,6 +37,16 @@ object TestUtil {
                 crewMovieId = movie.movieId,
                 job = "Producer",
                 name = "Crew Member $it"
+            )
+        }
+    }
+
+    fun createReviewsForMovie(movie: MovieEntity, reviewNumber: Int): List<ReviewEntity> {
+        return List(reviewNumber) {
+            ReviewEntity(
+                reviewMovieId = movie.movieId,
+                author = "Author $it",
+                content = "Content of review $it"
             )
         }
     }

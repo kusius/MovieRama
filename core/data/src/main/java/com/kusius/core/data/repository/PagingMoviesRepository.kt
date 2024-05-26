@@ -25,5 +25,5 @@ interface MoviesRepository {
     fun getSimilarMoviesPagingSource(movieId: Int) : Flow<PagingData<MovieSummary>>
     suspend fun markFavourite(movieId: Int, isFavourite: Boolean)
 
-    suspend fun getMovieDetails(movieId: Int): MovieDetails
+    fun getMovieDetailsFlow(movieId: Int): Flow<MovieDetails>
 }

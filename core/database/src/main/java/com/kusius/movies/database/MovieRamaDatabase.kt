@@ -12,6 +12,7 @@ import com.kusius.movies.database.model.GenreEntity
 import com.kusius.movies.database.model.MovieEntity
 import com.kusius.movies.database.model.MovieGenreCrossRef
 import com.kusius.movies.database.model.RemoteKeyEntity
+import com.kusius.movies.database.model.ReviewEntity
 
 @Database(
     entities = [
@@ -20,8 +21,9 @@ import com.kusius.movies.database.model.RemoteKeyEntity
         CastEntity::class,
         CrewEntity::class,
         GenreEntity::class,
-        MovieGenreCrossRef::class
-               ],
+        MovieGenreCrossRef::class,
+        ReviewEntity::class
+       ],
     version = 2
 )
 abstract class MovieRamaDatabase : RoomDatabase() {

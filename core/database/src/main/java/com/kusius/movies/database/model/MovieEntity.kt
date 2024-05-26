@@ -22,15 +22,6 @@ data class MovieEntity(
     val overview: String = ""
 )
 
-data class MovieGenreEntity(
-    val id: Int,
-    val name: String
-)
-
-data class MovieReview(
-    val authorName: String,
-    val content: String
-)
 fun MovieEntity.asExternalModel() = MovieSummary(
     id = movieId,
     posterUrl = posterUrl,
