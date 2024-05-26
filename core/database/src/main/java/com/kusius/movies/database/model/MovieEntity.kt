@@ -10,7 +10,7 @@ import com.kusius.movies.core.model.MovieSummary
 )
 data class MovieEntity(
     @PrimaryKey
-    val id: Int,
+    val movieId: Int,
     val posterUrl: String,
     val title: String,
     val releaseDate: String,
@@ -18,11 +18,12 @@ data class MovieEntity(
     @ColumnInfo(defaultValue = "false")
     val isFavourite: Boolean,
     val popularity: Float,
-    val isSearchResult: Boolean
+    val isSearchResult: Boolean,
+    val overview: String = ""
 )
 
 fun MovieEntity.asExternalModel() = MovieSummary(
-    id = id,
+    id = movieId,
     posterUrl = posterUrl,
     title = title,
     releaseDate = releaseDate,

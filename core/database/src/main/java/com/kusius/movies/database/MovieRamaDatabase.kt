@@ -6,12 +6,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.kusius.movies.database.dao.MovieDao
 import com.kusius.movies.database.dao.RemoteKeyDao
+import com.kusius.movies.database.model.CastEntity
+import com.kusius.movies.database.model.CrewEntity
+import com.kusius.movies.database.model.GenreEntity
 import com.kusius.movies.database.model.MovieEntity
+import com.kusius.movies.database.model.MovieGenreCrossRef
 import com.kusius.movies.database.model.RemoteKeyEntity
+import com.kusius.movies.database.model.ReviewEntity
 
 @Database(
-    entities = [ MovieEntity::class, RemoteKeyEntity::class ],
-    version = 1
+    entities = [
+        MovieEntity::class,
+        RemoteKeyEntity::class,
+        CastEntity::class,
+        CrewEntity::class,
+        GenreEntity::class,
+        MovieGenreCrossRef::class,
+        ReviewEntity::class
+       ],
+    version = 2
 )
 abstract class MovieRamaDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
@@ -27,6 +40,7 @@ abstract class MovieRamaDatabase : RoomDatabase() {
                     MovieRamaDatabase::class.java,
                     "MovieRamaDatabase"
                 )
+                    .fallbackToDestructiveMigration()
                     .build()
 
                 INSTANCE = instance

@@ -1,5 +1,6 @@
 package com.kusius.movies.feature.popular
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,8 +81,8 @@ fun MoviesScreen(
     fun refresh() = refreshScope.launch {
         lazyPagingItems.refresh()
     }
+    val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = ::refresh)
 
-    val state = rememberPullRefreshState(refreshing, ::refresh)
     fun search(query: String) {
         onSearchQueryChanged(query)
     }
@@ -95,17 +96,14 @@ fun MoviesScreen(
         )
         Box(
             modifier = modifier
-                .pullRefresh(state = state)
+                .pullRefresh(state = pullRefreshState)
                 .padding(top = dimensionResource(id = designR.dimen.padding_small))
         ) {
-            LazyColumn() {
-                if (lazyPagingItems.loadState.refresh == LoadState.Loading) {
-                    refreshing = true
-                }
-
+            LazyColumn {
                 items(count = lazyPagingItems.itemCount) { index ->
                     refreshing = false
                     val item = lazyPagingItems[index]
+                    Log.i("PopularMoviesScreen", "lazy item $index = $item")
                     if (item != null)
                         MovieItem(
                             movieSummary = item,
@@ -134,8 +132,8 @@ fun MoviesScreen(
                     .testTag("PullRefreshIndicator")
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally),
-                refreshing = true,
-                state = state,
+                refreshing = refreshing,
+                state = pullRefreshState,
             )
         }
 
