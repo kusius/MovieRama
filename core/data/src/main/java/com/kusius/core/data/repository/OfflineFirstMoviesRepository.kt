@@ -20,7 +20,11 @@ import com.kusius.movies.database.model.asExternalModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 
@@ -40,7 +44,9 @@ class OfflineFirstMoviesRepository(
             remoteMediator = MoviesRemoteMediator(query, database, networkDataSource)
         ) {
             movieDao.pagingSourceByQuery(query)
-        }.flow.map { it.map(MovieEntity::asExternalModel) }
+        }.flow.map {
+            it.map(MovieEntity::asExternalModel)
+        }
     }
 
     override fun getSimilarMoviesPagingSource(movieId: Int): Flow<PagingData<MovieSummary>> {

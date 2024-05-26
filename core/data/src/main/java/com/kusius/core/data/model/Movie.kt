@@ -9,7 +9,7 @@ import com.kusius.movies.database.model.MovieEntity
  * Converts a movie as received from the network into a database entity.
   */
 fun NetworkMovie.asEntity(isFavourite: Boolean, isSearchResult: Boolean) = MovieEntity(
-    id = id,
+    movieId = id,
     posterUrl = backdropUrl,
     title = title,
     ratingOutOf10 = rating,

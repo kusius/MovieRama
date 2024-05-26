@@ -17,7 +17,7 @@ import com.kusius.movies.core.designsystem.R
 
 @Composable
 fun MovieRamaFavouriteButton(isFavourite: Boolean, onFavouriteChanged: (Boolean) -> Unit, modifier: Modifier = Modifier) {
-    var favourite by remember { mutableStateOf(isFavourite) }
+    var favourite = isFavourite
     IconToggleButton(
         checked = favourite,
         onCheckedChange = {
@@ -28,7 +28,7 @@ fun MovieRamaFavouriteButton(isFavourite: Boolean, onFavouriteChanged: (Boolean)
         val tint by animateColorAsState(
             if (favourite) colorResource(id = R.color.favourite) else colorResource(
                 id = R.color.not_favourite
-            )
+            ), label = "Favourite color animation state"
         )
         Icon(
             imageVector = if (favourite) {

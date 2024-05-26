@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import com.kusius.movies.core.designsystem.theme.MovieRamaTheme
 
 @Composable
 fun MovieRamaSearchBar(
@@ -76,7 +77,7 @@ fun MovieRamaSearchBar(
 @Preview(showBackground = true)
 @Composable
 fun PreviewSearchBar() {
-    MaterialTheme() {
+    MovieRamaTheme() {
         MovieRamaSearchBar(
             searchQuery = "", onQueryChanged = {}, onSearch = {},
             placeholder = { Text(text = "Enter your search ") }

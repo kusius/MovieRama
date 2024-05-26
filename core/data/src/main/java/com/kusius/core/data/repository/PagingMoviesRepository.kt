@@ -6,6 +6,7 @@ import com.kusius.core.data.paging.SearchPagingKey
 import com.kusius.movies.core.model.MovieDetails
 import com.kusius.movies.core.model.MovieSummary
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface PagingMoviesRepository {
     fun getPopularMoviesPagingSource() : PagingSource<Int, MovieSummary>
