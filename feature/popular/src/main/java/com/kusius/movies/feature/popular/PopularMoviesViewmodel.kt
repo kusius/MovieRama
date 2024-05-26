@@ -1,7 +1,9 @@
 package com.kusius.movies.feature.popular
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.log
 import androidx.paging.map
 import com.kusius.core.data.repository.MoviesRepository
 import com.kusius.movies.core.domain.usecase.FormatDateUseCase
@@ -10,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
@@ -46,6 +49,10 @@ class PopularMoviesViewmodel(private val moviesRepository: MoviesRepository) : V
         viewModelScope.launch {
             _searchQuery.value = query
         }
+    }
+
+    companion object {
+        private const val TAG = "PopularMoviesViewmodel"
     }
 }
 

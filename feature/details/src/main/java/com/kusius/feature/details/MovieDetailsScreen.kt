@@ -19,9 +19,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -56,6 +60,7 @@ import com.kusius.movies.core.designsystem.theme.component.MovieRamaTopAppBar
 import com.kusius.movies.core.designsystem.R as designR
 import com.kusius.movies.core.model.MovieSummary
 import com.kusius.movies.feature.details.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,27 +74,50 @@ internal fun MovieDetailsRoute(
     val similarMovies = viewModel.similarMovies.collectAsLazyPagingItems()
     val canNavigateBack = navController.previousBackStackEntry != null
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    Box(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-    ) {
-        if (movieDetailsUiState is MovieDetailsUiState.Content) {
-            MovieDetailsScreen(
-                movieDetails = (movieDetailsUiState as MovieDetailsUiState.Content).movieDetails,
-                similarMovies = similarMovies,
-                onFavouriteChange = { isFavourite ->
-                    viewModel.markFavourite(movieId, isFavourite)
+    val scope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        topBar = {
+            MovieRamaTopAppBar(
+                scrollBehavior = scrollBehavior,
+                canNavigateBack = canNavigateBack,
+                onNavigationClick = {
+                    navController.navigateUp()
                 },
+                modifier = Modifier
             )
         }
-        MovieRamaTopAppBar(
-            scrollBehavior = scrollBehavior,
-            canNavigateBack = canNavigateBack,
-            onNavigationClick = {
-                navController.navigateUp()
-            },
+    ) { contentPadding ->
+        Box(
             modifier = Modifier
-        )
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .padding(contentPadding)
+        ) {
+            when(val state = movieDetailsUiState) {
+                is MovieDetailsUiState.Content -> {
+                    MovieDetailsScreen(
+                        movieDetails = state.movieDetails,
+                        similarMovies = similarMovies,
+                        onFavouriteChange = { isFavourite ->
+                            viewModel.markFavourite(movieId, isFavourite)
+                        }
+                    )
+                }
 
+                is MovieDetailsUiState.Error -> {
+                    val message = stringResource(id = state.message)
+                    LaunchedEffect(null) {
+                        launch {
+                            snackBarHostState.showSnackbar(message)
+                        }
+                    }
+                }
+                MovieDetailsUiState.Loading -> {
+
+                }
+            }
+        }
     }
 }
 
@@ -246,7 +274,6 @@ fun MoviesScreenPreview(
     @PreviewParameter(MovieDetailsPreviewParameterProvider::class)
     movieDetails: MovieDetailsScreenParams,
 ) {
-
     MaterialTheme {
         MovieDetailsScreen(
             movieDetails = movieDetails.movieDetails,
@@ -254,4 +281,10 @@ fun MoviesScreenPreview(
             onFavouriteChange = {}
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MoviesErrorPreview() {
+
 }
