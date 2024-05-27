@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,26 +74,14 @@ internal fun MovieDetailsRoute(
     val movieDetailsUiState by viewModel.movieDetails.collectAsState()
     val similarMovies = viewModel.similarMovies.collectAsLazyPagingItems()
     val canNavigateBack = navController.previousBackStackEntry != null
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val scope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        topBar = {
-            MovieRamaTopAppBar(
-                scrollBehavior = scrollBehavior,
-                canNavigateBack = canNavigateBack,
-                onNavigationClick = {
-                    navController.navigateUp()
-                },
-                modifier = Modifier
-            )
-        }
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { contentPadding ->
         Box(
-            modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .padding(contentPadding)
+            modifier = Modifier.padding(contentPadding)
         ) {
             when(val state = movieDetailsUiState) {
                 is MovieDetailsUiState.Content -> {
@@ -118,6 +107,16 @@ internal fun MovieDetailsRoute(
                 }
             }
         }
+
+        MovieRamaTopAppBar(
+            scrollBehavior = scrollBehavior,
+            canNavigateBack = canNavigateBack,
+            onNavigationClick = {
+                navController.navigateUp()
+            },
+            modifier = Modifier
+        )
+
     }
 }
 
