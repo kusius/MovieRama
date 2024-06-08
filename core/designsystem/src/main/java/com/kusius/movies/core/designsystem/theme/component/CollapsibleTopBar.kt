@@ -12,11 +12,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,7 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.ExperimentalMotionApi
@@ -49,6 +58,9 @@ import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.Visibility
 import com.kusius.movies.core.designsystem.R
 import kotlin.math.abs
+
+private const val titleId = "title"
+private const val posterId = "poster"
 
 @OptIn(ExperimentalMotionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -59,11 +71,12 @@ fun MovieRamaCollapsibleTopBar(
     onNavigationClick: () -> Unit = {},
     backDropContent: @Composable (modifier: Modifier) -> Unit
 ) {
-    val expandedToolBarHeightDp = 250.dp
+    val expandedToolBarHeightDp = 350
+    val collapsedToolbarHeight = 64
     // Sets the app bar's height offset to collapse the entire bar's height when content is
     // scrolled.
     val heightOffsetLimit =
-        with(LocalDensity.current) { -64.dp.toPx() }
+        with(LocalDensity.current) { -collapsedToolbarHeight.dp.toPx() }
     SideEffect {
         if (scrollBehavior.state.heightOffsetLimit != heightOffsetLimit) {
             scrollBehavior.state.heightOffsetLimit = heightOffsetLimit
@@ -90,74 +103,72 @@ fun MovieRamaCollapsibleTopBar(
         Modifier
     }
     val progress = scrollBehavior.state.collapsedFraction
-    val totalToolbarHeight = (expandedToolBarHeightDp + scrollBehavior.state.heightOffset.dp)
-    Surface(modifier = Modifier.then(appBarDragModifier).height(totalToolbarHeight)) {
+    val totalToolbarHeight = with(LocalDensity.current) {
+        (progress * (collapsedToolbarHeight - expandedToolBarHeightDp) + expandedToolBarHeightDp)
+    }
         MotionLayout(
             start = expandedConstraintSet(),
             // todo: get this value more consistently, however 64dp is the size defined for the
             //  material top appbar as of the time of writing
-            end = collapsedConstraintSet(64.dp),
+            end = collapsedConstraintSet(),
             progress = progress,
             modifier = Modifier
                 .fillMaxWidth()
+                .height(totalToolbarHeight.dp)
+                .then(appBarDragModifier)
+
         ) {
-            Box(modifier = Modifier.layoutId("poster")) {
+            Box(modifier = Modifier.layoutId(posterId)) {
                 backDropContent(Modifier)
             }
-            Box(modifier = Modifier.layoutId("title")) {
+            Box(modifier = Modifier.layoutId(titleId)) {
                 Text(
                     text = titleText,
                     modifier = Modifier
                         .wrapContentHeight(),
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center
                 )
             }
-        }
+
+
     }
 }
 
 private fun expandedConstraintSet() = ConstraintSet {
-    val poster = createRefFor("poster")
-    val title = createRefFor("title")
+    val poster = createRefFor(posterId)
+    val title = createRefFor(titleId)
 
     // todo: refactor to use centerVerticallyTo because text hides
     //  alternatively (or at the same time) put the two in the same box inside
     //  MotionLayout so that when animating they can overlap
     constrain(poster) {
         width = Dimension.fillToConstraints
-        height = Dimension.value(200.dp)
         start.linkTo(parent.start)
         end.linkTo(parent.end)
         top.linkTo(parent.top)
+        bottom.linkTo(poster.top)
     }
 
     constrain(title) {
+        start.linkTo(parent.start, 8.dp)
         // todo: get this from resources (this is not a composable function though ...)
-        start.linkTo(parent.start, 16.dp)
-        top.linkTo(poster.bottom, 16.dp)
+        top.linkTo(poster.bottom)
+        bottom.linkTo(parent.bottom)
     }
 }
 
-private fun collapsedConstraintSet(toolbarHeight: Dp) = ConstraintSet {
-    val poster = createRefFor("poster")
-    val title = createRefFor("title")
+private fun collapsedConstraintSet() = ConstraintSet {
+    val poster = createRefFor(posterId)
+    val title = createRefFor(titleId)
 
     constrain(poster) {
-//        width = Dimension.fillToConstraints
-//        start.linkTo(parent.start)
-//        end.linkTo(parent.end)
-//        top.linkTo(parent.top)
-        visibility = Visibility.Gone
+        visibility = Visibility.Invisible
     }
 
     constrain(title) {
-        start.linkTo(parent.start)
-        top.linkTo(parent.top, 8.dp)
-        end.linkTo(parent.end)
-        bottom.linkTo(parent.bottom, 8.dp)
-        scaleX = 0.7f
-        scaleY = 0.7f
+        centerHorizontallyTo(parent)
+        centerVerticallyTo(parent)
     }
 }
 
@@ -165,14 +176,8 @@ private fun collapsedConstraintSet(toolbarHeight: Dp) = ConstraintSet {
 @Preview(showBackground = true)
 @Composable
 fun PreviewCollapsibleTopBar() {
-    val animateToEnd = true
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val progress by animateFloatAsState(
-        targetValue = if (animateToEnd) 1f else 0f,
-        animationSpec = tween(1000),
-        label = "collapsing toolbar progress"
-    )
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     MaterialTheme {
         Scaffold(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -180,7 +185,7 @@ fun PreviewCollapsibleTopBar() {
             topBar = {
                 MovieRamaCollapsibleTopBar(
                     scrollBehavior = scrollBehavior,
-                    titleText = "Mandalorian"
+                    titleText = "Mandalorian Long Title Movie ${scrollBehavior.state.heightOffset}"
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.placeholder),
@@ -189,7 +194,6 @@ fun PreviewCollapsibleTopBar() {
                             .fillMaxWidth()
                             .background(MaterialTheme.colorScheme.primary),
                         contentScale = ContentScale.FillWidth,
-                        alpha = 1f - progress // Update alpha based on progress. Expanded -> 1f / Collapsed -> 0f (transparent)
                     )
                 }
             }
