@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -86,7 +87,8 @@ internal fun MovieDetailsRoute(
                 MovieRamaCollapsibleTopBar(
                     titleText = state.movieDetails.summary.title,
                     scrollBehavior = scrollBehavior,
-                    canNavigateBack = canNavigateBack
+                    canNavigateBack = canNavigateBack,
+                    onNavigationClick = { navController.navigateUp() }
                 ) {
                     AsyncImage(
                         model = state.movieDetails.summary.posterUrl,
@@ -94,7 +96,7 @@ internal fun MovieDetailsRoute(
                         error = painterResource(id = designR.drawable.placeholder),
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
-                        modifier = Modifier
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -146,23 +148,10 @@ fun MovieDetailsScreen(
             modifier = modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomStart
         ) {
-
-//            AsyncImage(
-//                model = movieDetails.summary.posterUrl,
-//                placeholder = painterResource(id = designR.drawable.placeholder),
-//                error = painterResource(id = designR.drawable.placeholder),
-//                contentScale = ContentScale.Crop,
-//                contentDescription = null,
-//                modifier = modifier.fillMaxSize()
-//            )
             Column(
                 modifier = modifier
                     .padding(paddingSmalll)
             ) {
-//                Text(
-//                    text = movieDetails.summary.title,
-//                    style = MaterialTheme.typography.headlineMedium,
-//                )
                 Text(
                     text = movieDetails.genres.joinToString(", ") { it.name },
                     style = MaterialTheme.typography.bodyMedium,

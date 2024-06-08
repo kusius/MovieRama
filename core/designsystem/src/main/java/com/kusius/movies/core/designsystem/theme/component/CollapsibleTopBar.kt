@@ -16,14 +16,21 @@ import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -42,14 +49,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.max
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
@@ -61,6 +72,7 @@ import kotlin.math.abs
 
 private const val titleId = "title"
 private const val posterId = "poster"
+private const val iconId = "icon"
 
 @OptIn(ExperimentalMotionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -103,41 +115,51 @@ fun MovieRamaCollapsibleTopBar(
         Modifier
     }
     val progress = scrollBehavior.state.collapsedFraction
-    val totalToolbarHeight = with(LocalDensity.current) {
-        (progress * (collapsedToolbarHeight - expandedToolBarHeightDp) + expandedToolBarHeightDp)
-    }
-        MotionLayout(
-            start = expandedConstraintSet(),
-            // todo: get this value more consistently, however 64dp is the size defined for the
-            //  material top appbar as of the time of writing
-            end = collapsedConstraintSet(),
-            progress = progress,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(totalToolbarHeight.dp)
-                .then(appBarDragModifier)
+    MotionLayout(
+        start = expandedConstraintSet(),
+        // todo: get this value more consistently, however 64dp is the size defined for the
+        //  material top appbar as of the time of writing
+        end = collapsedConstraintSet(),
+        progress = progress,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(lerp(expandedToolBarHeightDp.dp, collapsedToolbarHeight.dp, progress))
+            .then(appBarDragModifier)
 
-        ) {
-            Box(modifier = Modifier.layoutId(posterId)) {
-                backDropContent(Modifier)
+    ) {
+        Box(modifier = Modifier.layoutId(posterId)) {
+            backDropContent(Modifier)
+        }
+//        Box(modifier = Modifier.layoutId(iconId).wrapContentWidth()) {
+            if(canNavigateBack) {
+                IconButton(onClick = onNavigationClick, modifier = Modifier.layoutId(iconId)) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button),
+                    )
+                }
             }
-            Box(modifier = Modifier.layoutId(titleId)) {
-                Text(
-                    text = titleText,
-                    modifier = Modifier
-                        .wrapContentHeight(),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-
+//        }
+//        Box(modifier = Modifier.layoutId(titleId).fillMaxWidth()) {
+            Text(
+                text = titleText,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .layoutId(titleId)
+                ,
+                style = MaterialTheme.typography.headlineSmall,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                textAlign = TextAlign.Left,
+            )
+//        }
     }
 }
 
 private fun expandedConstraintSet() = ConstraintSet {
     val poster = createRefFor(posterId)
     val title = createRefFor(titleId)
+    val icon = createRefFor(iconId)
 
     // todo: refactor to use centerVerticallyTo because text hides
     //  alternatively (or at the same time) put the two in the same box inside
@@ -148,6 +170,12 @@ private fun expandedConstraintSet() = ConstraintSet {
         end.linkTo(parent.end)
         top.linkTo(parent.top)
         bottom.linkTo(poster.top)
+    }
+
+
+    constrain(icon) {
+        start.linkTo(parent.start)
+        top.linkTo(parent.top)
     }
 
     constrain(title) {
@@ -161,14 +189,23 @@ private fun expandedConstraintSet() = ConstraintSet {
 private fun collapsedConstraintSet() = ConstraintSet {
     val poster = createRefFor(posterId)
     val title = createRefFor(titleId)
+    val icon = createRefFor(iconId)
 
     constrain(poster) {
         visibility = Visibility.Invisible
     }
 
+    constrain(icon) {
+        start.linkTo(parent.start)
+        top.linkTo(parent.top)
+    }
+
     constrain(title) {
-        centerHorizontallyTo(parent)
-        centerVerticallyTo(parent)
+        width = Dimension.fillToConstraints
+        top.linkTo(icon.top)
+        bottom.linkTo(icon.bottom)
+        start.linkTo(icon.end)
+        end.linkTo(parent.end, 16.dp)
     }
 }
 
@@ -185,7 +222,7 @@ fun PreviewCollapsibleTopBar() {
             topBar = {
                 MovieRamaCollapsibleTopBar(
                     scrollBehavior = scrollBehavior,
-                    titleText = "Mandalorian Long Title Movie ${scrollBehavior.state.heightOffset}"
+                    titleText = "Mandalorian Very Very Long Title Movie ${scrollBehavior.state.heightOffset}"
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.placeholder),
