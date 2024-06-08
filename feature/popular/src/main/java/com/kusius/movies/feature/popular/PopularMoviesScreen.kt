@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -103,7 +105,6 @@ fun MoviesScreen(
                 items(count = lazyPagingItems.itemCount) { index ->
                     refreshing = false
                     val item = lazyPagingItems[index]
-                    Log.i("PopularMoviesScreen", "lazy item $index = $item")
                     if (item != null)
                         MovieItem(
                             movieSummary = item,
@@ -181,7 +182,7 @@ fun MovieInformation(movieSummary: MovieSummary, onFavouriteChange: (Boolean) ->
 @Composable
 fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit, modifier: Modifier = Modifier) {
     Card(
-        elevation = CardDefaults.cardElevation(8.dp),
+        elevation = CardDefaults.cardElevation(24.dp),
         modifier = modifier.fillMaxWidth()
     ){
         Column(modifier = Modifier){
@@ -190,7 +191,8 @@ fun MovieItem(movieSummary: MovieSummary, onFavouriteChanged: (Boolean) -> Unit,
                 placeholder = painterResource(id = designR.drawable.placeholder),
                 error = painterResource(id = designR.drawable.placeholder),
                 contentScale = ContentScale.Crop,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.height(200.dp)
             )
             Row {
                 MovieInformation(
