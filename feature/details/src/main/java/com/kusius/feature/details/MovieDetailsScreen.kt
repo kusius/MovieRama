@@ -28,10 +28,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.kusius.movies.core.model.MovieDetails
-import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,29 +35,32 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.kusius.feature.details.ui.MovieDetailsPreviewParameterProvider
 import com.kusius.feature.details.ui.MovieDetailsScreenParams
+import com.kusius.movies.core.designsystem.theme.component.MovieRamaCollapsibleTopBar
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaFavouriteButton
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaRating
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaSection
-import com.kusius.movies.core.designsystem.theme.component.MovieRamaTopAppBar
-import com.kusius.movies.core.designsystem.R as designR
+import com.kusius.movies.core.model.MovieDetails
 import com.kusius.movies.core.model.MovieSummary
 import com.kusius.movies.feature.details.R
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import com.kusius.movies.core.designsystem.R as designR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,20 +69,43 @@ internal fun MovieDetailsRoute(
     viewModel: MovieDetailsViewmodel = koinViewModel(),
     navController: NavController = rememberNavController()
 ) {
+    // todo: delete this, i believe its not necessary (was it ever ?)
     viewModel.getMovieDetails(movieId)
+    val topAppbarState = rememberTopAppBarState()
     val movieDetailsUiState by viewModel.movieDetails.collectAsState()
     val similarMovies = viewModel.similarMovies.collectAsLazyPagingItems()
     val canNavigateBack = navController.previousBackStackEntry != null
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppbarState)
     val snackBarHostState = remember { SnackbarHostState() }
+    val state = movieDetailsUiState
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            if(state is MovieDetailsUiState.Content) {
+                MovieRamaCollapsibleTopBar(
+                    titleText = state.movieDetails.summary.title,
+                    scrollBehavior = scrollBehavior,
+                    canNavigateBack = canNavigateBack,
+                    onNavigationClick = { navController.navigateUp() }
+                ) {
+                    AsyncImage(
+                        model = state.movieDetails.summary.posterUrl,
+                        placeholder = painterResource(id = designR.drawable.placeholder),
+                        error = painterResource(id = designR.drawable.placeholder),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier.padding(contentPadding)
         ) {
-            when(val state = movieDetailsUiState) {
+            when(state) {
                 is MovieDetailsUiState.Content -> {
                     MovieDetailsScreen(
                         movieDetails = state.movieDetails,
@@ -107,16 +129,6 @@ internal fun MovieDetailsRoute(
                 }
             }
         }
-
-        MovieRamaTopAppBar(
-            scrollBehavior = scrollBehavior,
-            canNavigateBack = canNavigateBack,
-            onNavigationClick = {
-                navController.navigateUp()
-            },
-            modifier = Modifier
-        )
-
     }
 }
 
@@ -136,28 +148,13 @@ fun MovieDetailsScreen(
             modifier = modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomStart
         ) {
-
-            AsyncImage(
-                model = movieDetails.summary.posterUrl,
-                placeholder = painterResource(id = designR.drawable.placeholder),
-                error = painterResource(id = designR.drawable.placeholder),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = modifier.fillMaxSize()
-            )
             Column(
                 modifier = modifier
                     .padding(paddingSmalll)
             ) {
                 Text(
-                    text = movieDetails.summary.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
-                )
-                Text(
                     text = movieDetails.genres.joinToString(", ") { it.name },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
                 )
             }
         }
