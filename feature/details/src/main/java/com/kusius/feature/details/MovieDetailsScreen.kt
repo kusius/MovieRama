@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,7 +38,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -54,10 +52,10 @@ import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImage
 import com.kusius.feature.details.ui.MovieDetailsPreviewParameterProvider
 import com.kusius.feature.details.ui.MovieDetailsScreenParams
+import com.kusius.movies.core.designsystem.theme.component.MovieRamaCollapsibleTopBar
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaFavouriteButton
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaRating
 import com.kusius.movies.core.designsystem.theme.component.MovieRamaSection
-import com.kusius.movies.core.designsystem.theme.component.MovieRamaTopAppBar
 import com.kusius.movies.core.designsystem.R as designR
 import com.kusius.movies.core.model.MovieSummary
 import com.kusius.movies.feature.details.R
@@ -70,20 +68,42 @@ internal fun MovieDetailsRoute(
     viewModel: MovieDetailsViewmodel = koinViewModel(),
     navController: NavController = rememberNavController()
 ) {
+    // todo: delete this, i believe its not necessary (was it ever ?)
     viewModel.getMovieDetails(movieId)
+    val topAppbarState = rememberTopAppBarState()
     val movieDetailsUiState by viewModel.movieDetails.collectAsState()
     val similarMovies = viewModel.similarMovies.collectAsLazyPagingItems()
     val canNavigateBack = navController.previousBackStackEntry != null
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppbarState)
     val snackBarHostState = remember { SnackbarHostState() }
+    val state = movieDetailsUiState
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            if(state is MovieDetailsUiState.Content) {
+                MovieRamaCollapsibleTopBar(
+                    titleText = state.movieDetails.summary.title,
+                    scrollBehavior = scrollBehavior,
+                    canNavigateBack = canNavigateBack
+                ) {
+                    AsyncImage(
+                        model = state.movieDetails.summary.posterUrl,
+                        placeholder = painterResource(id = designR.drawable.placeholder),
+                        error = painterResource(id = designR.drawable.placeholder),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                        modifier = Modifier
+                    )
+                }
+            }
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier.padding(contentPadding)
         ) {
-            when(val state = movieDetailsUiState) {
+            when(state) {
                 is MovieDetailsUiState.Content -> {
                     MovieDetailsScreen(
                         movieDetails = state.movieDetails,
@@ -107,16 +127,6 @@ internal fun MovieDetailsRoute(
                 }
             }
         }
-
-        MovieRamaTopAppBar(
-            scrollBehavior = scrollBehavior,
-            canNavigateBack = canNavigateBack,
-            onNavigationClick = {
-                navController.navigateUp()
-            },
-            modifier = Modifier
-        )
-
     }
 }
 
@@ -137,27 +147,25 @@ fun MovieDetailsScreen(
             contentAlignment = Alignment.BottomStart
         ) {
 
-            AsyncImage(
-                model = movieDetails.summary.posterUrl,
-                placeholder = painterResource(id = designR.drawable.placeholder),
-                error = painterResource(id = designR.drawable.placeholder),
-                contentScale = ContentScale.Crop,
-                contentDescription = null,
-                modifier = modifier.fillMaxSize()
-            )
+//            AsyncImage(
+//                model = movieDetails.summary.posterUrl,
+//                placeholder = painterResource(id = designR.drawable.placeholder),
+//                error = painterResource(id = designR.drawable.placeholder),
+//                contentScale = ContentScale.Crop,
+//                contentDescription = null,
+//                modifier = modifier.fillMaxSize()
+//            )
             Column(
                 modifier = modifier
                     .padding(paddingSmalll)
             ) {
-                Text(
-                    text = movieDetails.summary.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White
-                )
+//                Text(
+//                    text = movieDetails.summary.title,
+//                    style = MaterialTheme.typography.headlineMedium,
+//                )
                 Text(
                     text = movieDetails.genres.joinToString(", ") { it.name },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White
                 )
             }
         }
