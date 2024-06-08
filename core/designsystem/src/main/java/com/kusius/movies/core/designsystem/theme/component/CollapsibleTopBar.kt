@@ -1,5 +1,6 @@
 package com.kusius.movies.core.designsystem.theme.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.DecayAnimationSpec
@@ -28,11 +29,14 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -47,6 +51,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
@@ -115,6 +120,10 @@ fun MovieRamaCollapsibleTopBar(
         Modifier
     }
     val progress = scrollBehavior.state.collapsedFraction
+    val iconBackgroundColor by animateColorAsState(
+        targetValue = if (progress <= 0.1f) Color.White.copy(alpha = 0.4f) else Color.Transparent,
+        label = "back button color"
+    )
     MotionLayout(
         start = expandedConstraintSet(),
         // todo: get this value more consistently, however 64dp is the size defined for the
@@ -130,17 +139,19 @@ fun MovieRamaCollapsibleTopBar(
         Box(modifier = Modifier.layoutId(posterId)) {
             backDropContent(Modifier)
         }
-//        Box(modifier = Modifier.layoutId(iconId).wrapContentWidth()) {
             if(canNavigateBack) {
-                IconButton(onClick = onNavigationClick, modifier = Modifier.layoutId(iconId)) {
+                IconButton(
+                    onClick = onNavigationClick,
+                    modifier = Modifier
+                        .layoutId(iconId)
+                        .background(iconBackgroundColor, shape = MaterialTheme.shapes.extraLarge)
+                ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button),
                     )
                 }
             }
-//        }
-//        Box(modifier = Modifier.layoutId(titleId).fillMaxWidth()) {
             Text(
                 text = titleText,
                 modifier = Modifier
@@ -152,7 +163,6 @@ fun MovieRamaCollapsibleTopBar(
                 maxLines = 1,
                 textAlign = TextAlign.Left,
             )
-//        }
     }
 }
 
@@ -174,8 +184,8 @@ private fun expandedConstraintSet() = ConstraintSet {
 
 
     constrain(icon) {
-        start.linkTo(parent.start)
-        top.linkTo(parent.top)
+        start.linkTo(parent.start, 8.dp)
+        top.linkTo(parent.top, 8.dp)
     }
 
     constrain(title) {
