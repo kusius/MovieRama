@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -43,6 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
@@ -57,6 +60,7 @@ import kotlin.math.abs
 private const val titleId = "title"
 private const val posterId = "poster"
 private const val iconId = "icon"
+private const val paddingSmall = 8
 
 @OptIn(ExperimentalMotionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -100,9 +104,11 @@ fun MovieRamaCollapsibleTopBar(
     }
     val progress = scrollBehavior.state.collapsedFraction
     val iconBackgroundColor by animateColorAsState(
-        targetValue = if (progress <= 0.1f) Color.White.copy(alpha = 0.4f) else Color.Transparent,
+        targetValue = if (progress <= 0.1f) Color.Black.copy(alpha = 0.4f) else Color.Transparent,
         label = "back button color"
     )
+    val iconColorTint = if(progress <= 0.1f) Color.White else LocalContentColor.current
+
     MotionLayout(
         start = expandedConstraintSet(),
         // todo: get this value more consistently, however 64dp is the size defined for the
@@ -127,6 +133,7 @@ fun MovieRamaCollapsibleTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
+                        tint = iconColorTint,
                         contentDescription = stringResource(R.string.back_button),
                     )
                 }
@@ -163,15 +170,15 @@ private fun expandedConstraintSet() = ConstraintSet {
 
 
     constrain(icon) {
-        start.linkTo(parent.start, 8.dp)
-        top.linkTo(parent.top, 8.dp)
+        start.linkTo(parent.start, paddingSmall.dp)
+        top.linkTo(parent.top, paddingSmall.dp)
     }
 
     constrain(title) {
-        start.linkTo(parent.start, 8.dp)
+        start.linkTo(parent.start, paddingSmall.dp)
         // todo: get this from resources (this is not a composable function though ...)
-        top.linkTo(poster.bottom)
-        bottom.linkTo(parent.bottom)
+        top.linkTo(poster.bottom, paddingSmall.dp)
+        bottom.linkTo(parent.bottom, paddingSmall.dp)
     }
 }
 
@@ -185,11 +192,13 @@ private fun collapsedConstraintSet() = ConstraintSet {
     }
 
     constrain(icon) {
+        centerVerticallyTo(parent)
         start.linkTo(parent.start)
         top.linkTo(parent.top)
     }
 
     constrain(title) {
+        // important, this ellipsizes the text if it does not fit
         width = Dimension.fillToConstraints
         top.linkTo(icon.top)
         bottom.linkTo(icon.bottom)
@@ -201,7 +210,10 @@ private fun collapsedConstraintSet() = ConstraintSet {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun PreviewCollapsibleTopBar() {
+fun PreviewCollapsibleTopBar(
+    @PreviewParameter(LoremIpsum::class)
+    body: String
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     MaterialTheme {
@@ -227,7 +239,7 @@ fun PreviewCollapsibleTopBar() {
             Box(
                 modifier = Modifier.padding(paddingValues)
             ) {
-                Text(text = "Hello")
+                Text(text = body)
             }
         }
     }
